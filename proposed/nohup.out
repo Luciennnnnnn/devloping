@@ -1,0 +1,18 @@
+Using numpy backend.
+Traceback (most recent call last):
+  File "main_proposed.py", line 1, in <module>
+    from proposed import *
+  File "/root/zhongying/luoxin/Algorithm/proposed/proposed.py", line 18, in <module>
+    from tool import *
+ModuleNotFoundError: No module named 'tool'
+Using numpy backend.
+Traceback (most recent call last):
+  File "main_proposed.py", line 178, in <module>
+    eval_time('Abilene', 8000)
+  File "main_proposed.py", line 16, in eval_time
+    model = evaluate(dataset_name, ed, 0.1, 0, 0.1, 15)
+  File "main_proposed.py", line 10, in evaluate
+    model = BCPF_IC(Y=Y, outliers_p=outliers_p, maxRank=R, maxiters=30, tol=1e-4, verbose=False)
+  File "/root/zhongying/luoxin/Algorithm/proposed/proposed.py", line 253, in BCPF_IC
+    model['precision'] = count / (end - start)
+NameError: name 'end' is not defined
