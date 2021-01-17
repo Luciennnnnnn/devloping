@@ -22,44 +22,7 @@ sys.path.append("../")
 from utils import *
 
 
-def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
-    #Bayesian CP Factorization for Tensor Completion
-    #
-    #   [model] = BCPF_TC(Y, 'PARAM1', val1, 'PARAM2', val2, ...)
-    #
-    #   INPUTS
-    #   Y - Input tensor
-    #   'epsilon' - Binary(0 - 1) missing indicator tensor of same size as Y
-    #          (0: missing; 1: observed)
-    #   'init' - Initialization method
-    #          - 'ml': SVD initilization(default)
-    #          - 'rand': Random matrices of rank(larger than true rank)
-    #   'dimRed' - True: Remove unnecessary components automaticly(default)
-    #            - False: Not remove
-    #   'maxiters' - max number of iterations(default: 100)
-    #   'tol' - lower band change tolerance for convergence dection (default: 1e-5)
-    #   'noise' - whether noise is updated
-    #           - 'on': update noise parameter(default)
-    #           - 'off': fixed noise parameter(1e-5)
-    #   'predVar' - Predictive distribution
-    #             - 1: compute and output
-    #             - 0: doesnot compute(default)
-    #   'verbose' - visualization of results
-    #             - 0: no
-    #             - 1: text(default)
-    #             - 2: image plot
-    #             - 3: hinton plot(very slow)
-    #   OUTPUTS
-    #       model - Model parameters and hyperparameters
-    #
-    #   Example:
-    #
-    #       [model] = BCPF_TC(Y, 'obs', O, 'init', 'rand', 'maxRank', 10, 'dimRed', 1, 'maxiters', 100, ...
-    #                     'tol', 1e-6, 'verbose', 3);
-    #
-    #   < Bayesian CP Factorization of Incomplete Tensor >
-    #  Set parameters from input or by using defaults
-
+def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
     R = maxRank
     dimY = Y.shape
     N = Y.ndim
@@ -118,6 +81,13 @@ def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
 
     sigma_E = np.ones_like(sigma_E0) # \overline{\zeta}, posterior precision of \mathcal{E}
     E = np.zeros_like(E0) # \overline{\mathcal{E}}, posterior mean of \mathcal{E}
+
+    mu = np.ones([K, 1]) # mean of gaussian component
+    zeta = 1e-6 # prior precision of mean of gaussian component
+    m_k = np.ones(K) # posterior mean of mean of gaussian component
+    s_k2 = np.ones(K) # posterior variance of mean of gaussian component
+    Cat = np.ones([dimY[0], dimY[1], K]) # indicator vector
+    phi = np.ones([dimY[0], dimY[1], K]) # posterior probability distribution of C
 
     RSE = []
     TPRS = []
@@ -203,9 +173,15 @@ def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
             tau = a_tauN / b_tauN # posterior mean of tau 
 
             # Update sparse matrix E
-            sigma_E[:, :, t] = tau + sigma_E0[:, :, t]
-            E[:, :, t] = sigma_E[:, :, t] * (E0[:, :, t]*sigma_E0[:, :, t] + tau * np.squeeze(C-np.expand_dims(X, axis=2)))
+            sigma_E[:, :, t] = tau + 1
+            E[:, :, t] = sigma_E[:, :, t] * (np.dot(phi, m_k) + tau * np.squeeze(C-np.expand_dims(X, axis=2)))
 
+            # Update mean of Gaussian component
+            s_k2 = np.reciprocal(zeta + np.sum(phi, (0, 1)))
+            m_k = s_k2 * np.sum(phi*E[:, :, t], (0, 1))
+
+            # update Gaussian assign
+            phi = m_k * E[:, :, t] - 0.5 * (np.squrae(E[:, :, t]) + sigma_E[:, :, t])
             # calculate lowerbound
 
             # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
@@ -245,14 +221,29 @@ def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
             # -E_q[lnq(\tau)]
             temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN
 
-            #E_q[lnp(\mathcal{E})]
-            temp6 = - 0.5 * np.sum(sigma_E0 * (np.square(E) + np.reciprocal(sigma_E)))
-                  # -0.5 * nObs * safelog(2 * pi) + 0.5 * np.sum(safelog(sigma_E0))
+            #E_q[lnp(\mathcal{E} | \mathcal{C}, \mu)]
+            temp6 = - 0.5 * np.sum(np.square(E[:, :, t]) + sigma_E[:, :, t])\
+                + np.sum(E[:, :, t] * phi[:, :] * m_k)\
+                - 0.5 * np.sum(phi[:, :] * (np.square(m_k) + s_k2))
+                  # -0.5 * nObs * safelog(2 * pi)
 
             # -E_q[lnq(\mathcal{E})]
             temp7 = - 0.5 * np.sum(safelog(sigma_E))
                     # + 0.5 * (nObs * safelog(2 * pi) + nObs)
 
+            # E_q[lnp(\mu)]
+            temp8 = -0.5 * zeta * np.sum(np.square(m_k) + s_k2) \
+                #-0.5 * K * safelog(2 * pi) + 0.5 * K * safelog(zeta)
+
+            # E_q[lnq(\mu)]
+            temp9 = 0.5 * np.sum(safelog(s_k2)) \
+                #+ 0.5 * K * (1 + safelog(2 * pi))
+
+            # E_q[lnp(\mathcal{C})]
+            temp10 = 0 \
+                - nObs * safelog(K)
+            # E_q[lnq(\mathcal{C})]
+            temp11 = -np.sum(phi * safelog(phi))
             # temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) \
             #     - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] \
             #         + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
@@ -261,7 +252,7 @@ def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
             #     + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] \
             #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
 
-            LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
+            LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7 + temp8 + temp9 + temp10 + temp11)
 
             # Display progress
             if it > 2:
@@ -272,9 +263,10 @@ def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
             if verbose:
                 print('Iter. %d: RelChan = %g' % (it, LBRelChan))
                 # Convergence check
-                if it > 5 and (abs(LBRelChan) < tol):
+            if it > 5 and (abs(LBRelChan) < tol):
+                if verbose:
                     print('======= Converged===========')
-                    break
+                break
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
         #false_locations.append(locations)

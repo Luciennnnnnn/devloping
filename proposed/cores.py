@@ -12,7 +12,7 @@ def evaluate(dataset_name, parameters):
     Y = Y[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
     print('in')
-    model = VITAD(Y=Y, outliers_p=outliers_p, maxRank=R, maxiters=20, tol=1e-4, verbose=False, init=inits[dataset_name])
+    model = VITAD(Y=Y, outliers_p=outliers_p, maxRank=R, maxiters=20, tol=1e-4, verbose=True, init=inits[dataset_name])
     return model
 
 

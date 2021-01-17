@@ -3,7 +3,7 @@ from cores import *
 
 if __name__ == '__main__':
     # run experiment for metrics outliers ratio
-    parameters = {"ed": 8000, "R":6, "mu":0, "sigma":0.1, "SNR":None, "noise_scheme": 'outlier', 'outliers_scheme': 'Gaussian'}
+    parameters = {"ed": 8000, "R":6, "mu":0, "sigma":0.1, "SNR":None, "noise_scheme": None, 'outliers_scheme': 'Gaussian'}
     start = time.time()
     eval_ratio('Abilene', parameters)
     end = time.time()
