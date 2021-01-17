@@ -22,7 +22,7 @@ sys.path.append("../..")
 from utils import *
 
 
-def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
+def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
     #Bayesian CP Factorization for Tensor Completion
     #
     #   [model] = BCPF_TC(Y, 'PARAM1', val1, 'PARAM2', val2, ...)

@@ -4,14 +4,14 @@ Rs = {'Abilene': 2, 'GEANT': 12, 'CERNET': 6, 'VData50': 6, 'VData100': 6, 'VDat
 inits = {'Abilene': 'rand', 'GEANT': 'rand', 'CERNET': 'ml', 'VData50': 'rand', 'VData100': 'rand', 'VData200': 'rand', 'VData300': 'rand', 'VData400': 'rand', 'VData500': 'rand'}
 
 
-def evaluate(dataset_name, ed, fraction, mu, sigma, R, SNR=None, noise_scheme='outlier'):
+def evaluate(dataset_name, parameters):
     # Run BayesCP
-    Y, outliers_p = generator(dataset_name, fraction, mu, sigma, SNR=SNR, noise_scheme=noise_scheme)
-    if ed == None:
-        ed = Y.shape[2]
+    Y, outliers_p = generator(dataset_name, parameters)
+    ed = parameters['ed']
+    R = parameters['R']
     Y = Y[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
-    model = BCPF_IC(Y=Y, outliers_p=outliers_p, maxRank=R, maxiters=20, tol=1e-4, verbose=False, init=inits[dataset_name])
+    model = VITAD(Y=Y, outliers_p=outliers_p, maxRank=R, maxiters=20, tol=1e-4, verbose=False, init=inits[dataset_name])
     return model
 
 
@@ -82,12 +82,13 @@ def eval_sigma(dataset_name):
         FD.write(json.dumps(FPRS))
 
 
-def eval_ratio(dataset_name):
+def eval_ratio(dataset_name, parameters):
     TPRS = []
     FPRS = []
 
     for fraction in range(1, 11, 1):
-        model = evaluate(dataset_name, 8000, fraction / 100, 0, 0.1, Rs[dataset_name])
+        parameters['fraction'] = fraction / 100
+        model = evaluate(dataset_name, parameters)
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
         #if fraction == 10:

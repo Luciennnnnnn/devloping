@@ -53,15 +53,18 @@ def choice(DIM, p):
     return X, Y, Z
 
 
-def generator(dataset_name, fraction, mu, sigma, SNR=None, noise_scheme=None, distribution="Gaussian"):
-    #print(os.getcwd())
+def generator(dataset_name, parameters):
     a = np.load(os.path.join(os.path.join('../../data', dataset_name), r'normlized_tensor.npy'))
     b = np.zeros_like(a, dtype=bool)
     DIM = a.shape
-
     locations = list(range(np.prod(DIM)))
+
+    sigma = parameters['sigma']
+    mu = parameters['mu']
+    fraction = parameters['fraction']
+    
     #Add noise
-    if noise_scheme == "outlier":
+    if parameters['noise_scheme'] == "outlier":
         outlier_noise = np.random.uniform(-5, 5, (DIM[0], DIM[1], DIM[2]))
         
         sampled_locations = np.random.choice(locations, int(len(locations) * 0.1), replace=False)
@@ -72,7 +75,7 @@ def generator(dataset_name, fraction, mu, sigma, SNR=None, noise_scheme=None, di
             i = x // DIM[1]
             j = x % DIM[1]
             a[i, j, k] += outlier_noise[i, j, k]
-    elif noise_scheme == "mixture":
+    elif parameters['noise_scheme'] == "mixture":
         outlier_noise = np.random.uniform(-5, 5, (DIM[0], DIM[1], DIM[2])) # 10%
         gaussian_noise_1 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 30%
         gaussian_noise_2 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 20%
@@ -97,15 +100,15 @@ def generator(dataset_name, fraction, mu, sigma, SNR=None, noise_scheme=None, di
                 a[i, j, k] += expoential_power_noise[i, j, k]
             
 
-    if SNR != None:
-        sigma2 = np.var(tensor_to_vec(a))*(1 / (10 ** (SNR / 10)))
-        GN = np.sqrt(sigma2) * np.random.randn(DIM[0], DIM[1], DIM[2])
-        a = a + GN
+    # if SNR != None:
+    #     sigma2 = np.var(tensor_to_vec(a))*(1 / (10 ** (SNR / 10)))
+    #     GN = np.sqrt(sigma2) * np.random.randn(DIM[0], DIM[1], DIM[2])
+    #     a = a + GN
 
     #Add outliers
-    if distribution == "Gaussian":
+    if parameters['outliers_scheme'] == "Gaussian":
         outliers = np.random.randn(DIM[0], DIM[1], DIM[2]) * sqrt(sigma) + mu
-    elif distribution == "levy_stable":
+    elif parameters['outliers_scheme'] == "levy_stable":
         outliers = levy_stable.rvs(sigma, mu, size=(DIM[0], DIM[1], DIM[2]))
 
     if fraction != 0:
