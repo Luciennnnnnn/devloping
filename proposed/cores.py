@@ -100,9 +100,9 @@ def eval_ratio(dataset_name, parameters):
         #    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/false_locations.json'), 'w') as FD:
         #        FD.write(json.dumps(model['false_locations']))
 
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/ratio_TPRS.json'), 'w') as FD:
+    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/ratio_' + parameters['noise_scheme'] + '_' + parameters['outliers_scheme'] + '_TPRS.json'), 'w') as FD:
         FD.write(json.dumps(TPRS))
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/ratio_FPRS.json'), 'w') as FD:
+    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/ratio_' + parameters['noise_scheme'] + '_' + parameters['outliers_scheme'] + '_FPRS.json'), 'w') as FD:
         FD.write(json.dumps(FPRS))
 
 

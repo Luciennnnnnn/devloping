@@ -175,7 +175,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
             # Update sparse matrix E
             sigma_E[:, :, t] = tau + 1
-            E[:, :, t] = sigma_E[:, :, t] * (np.dot(phi, m_k) + tau * np.squeeze(C-np.expand_dims(X, axis=2)))
+            E[:, :, t] = np.reciprocal(sigma_E[:, :, t]) * (np.dot(phi, m_k) + tau * np.squeeze(C-np.expand_dims(X, axis=2)))
 
             # Update mean of Gaussian component
             s_k2 = np.reciprocal(zeta + np.sum(phi, (0, 1)))
