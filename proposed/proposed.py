@@ -22,7 +22,7 @@ sys.path.append("../..")
 from utils import *
 
 
-def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
+def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
     #Bayesian CP Factorization for Tensor Completion
     #
     #   [model] = BCPF_TC(Y, 'PARAM1', val1, 'PARAM2', val2, ...)
@@ -63,7 +63,7 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     R = maxRank
     dimY = Y.shape
     N = Y.ndim
-    T = dimY[2]
+    T = dimY[N-1]
     outliers_count = np.sum(outliers_p, (0, 1))
     # Initialization
     a_tau0 = 1e-6
@@ -72,8 +72,8 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     tau = 1e4  # E[tau]
     dscale = 1
 
-    Z0 = []
-    ZSigma0 = []
+    Z0 = [] # A^n的先验的期望
+    ZSigma0 = [] # A^n的先验的方差
 
     for n in range(N-1):
         if init == 'rand':
@@ -90,16 +90,16 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     # S = np.diag(S)
     # z_tmp = np.dot(U[:, :R], np.square(S[:R, :R]))
 
-    Z = []
-    ZSigma = []
+    Z = [] # A^n的后验的期望
+    ZSigma = [] # A^n的后验的方差
     for n in range(N - 1):
         Z.append(Z0[n])  # E[A ^ (n)]
         ZSigma.append(ZSigma0[n])
 
-    # --------- E(aa') = cov(a,a) + E(a)E(a')----------------
+    # --------- E(aa^T) = cov(a,a) + E(a)E(a^T)----------------
     EZZT = []
     for n in range(N-1):
-        EZZT.append(np.reshape(ZSigma0[n], [R*R, dimY[n]], 'F').T)#向量化的B^(n)
+        EZZT.append(np.reshape(ZSigma[n], [R*R, dimY[n]], 'F').T)#向量化的B^(n)
     #         EZZT{n} = (reshape(ZSigma{n}, [R*R, dimY(n)]))' + khatrirao_fast(Z{n}',Z{n}')'\
 
     Z0_t = np.random.randn(T, R)
@@ -112,12 +112,12 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     ZSigma0_t = ZSigma0_t.repeat(T, axis=2)
     ZSigma_t = np.zeros_like(ZSigma0_t)
 
-    sigma_E0 = np.ones([dimY[0], dimY[1], T])
-    E0 = np.zeros([dimY[0], dimY[1], T])
+    sigma_E0 = np.ones([dimY[0], dimY[1], T]) # \zeta, prior precision of \mathcal{E}
+    E0 = np.zeros([dimY[0], dimY[1], T]) # actually not need
     # E0 = np.random.randn(dimY[0], dimY[1], 1)
 
-    sigma_E = np.ones_like(sigma_E0)
-    E = np.zeros_like(E0)
+    sigma_E = np.ones_like(sigma_E0) # \overline{\zeta}, posterior precision of \mathcal{E}
+    E = np.zeros_like(E0) # \overline{\mathcal{E}}, posterior mean of \mathcal{E}
 
     RSE = []
     TPRS = []
@@ -128,7 +128,6 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
         #  Model learning
-        #print(t)
         LB = []
         #if init == 'rand':
         #Z0_t = np.random.randn(1, R)
@@ -191,49 +190,76 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
                                 EZZT_t], reverse=bool)), np.ones([R * R, 1]))
 
             EE2 = np.sum(np.square(E[:, :, t]) + sigma_E[:, :, t])
-            err = np.dot(tensor_to_vec(C).T, tensor_to_vec(C)) - 2 * tensor_to_vec(C).T \
-                .dot(tensor_to_vec(X)) -2*np.dot(tensor_to_vec(C).T, tensor_to_vec(E[:, :, t])) + \
-                  2*np.dot(tensor_to_vec(X).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
+            err = np.dot(tensor_to_vec(C).T, tensor_to_vec(C)) \
+                    - 2 * tensor_to_vec(C).T.dot(tensor_to_vec(X)) \
+                    - 2*np.dot(tensor_to_vec(C).T, tensor_to_vec(E[:, :, t])) \
+                    + 2*np.dot(tensor_to_vec(X).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
 
-            #  update noise tau
+            # update noise tau
             a_tauN = (a_tau0 + 0.5 * nObs)  # a_MnObs
             b_tauN = (b_tau0 + 0.5 * err)  # b_M
 
-            tau = a_tauN / b_tauN
+            tau = a_tauN / b_tauN # posterior mean of tau 
 
-            #Update sparse matrix E
-            sigma_E[:, :, t] = np.reciprocal(tau + np.reciprocal(sigma_E0[:, :, t]))
-            E[:, :, t] = (sigma_E[:, :, t] * (E0[:, :, t]/sigma_E0[:, :, t] + tau * np.squeeze(C-np.expand_dims(X, axis=2))))
+            # Update sparse matrix E
+            sigma_E[:, :, t] = tau + sigma_E0[:, :, t]
+            E[:, :, t] = sigma_E[:, :, t] * (E0[:, :, t]*sigma_E0[:, :, t] + tau * np.squeeze(C-np.expand_dims(X, axis=2)))
 
-            temp1 = -0.5 * nObs * safelog(2 * pi) + 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) \
-                    - 0.5 * tau * err
-            temp2 = 0
+            # calculate lowerbound
+
+            # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
+            temp1 = 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) - 0.5 * tau * err 
+                    # - 0.5 * nObs * safelog(2 * pi)
+
+            # E_q[lnp(A)]
+            temp2 = 0 
             for n in range(N-1):
                 for i in range(dimY[n]):
-                  temp2 += -0.5 * R * safelog(2 * pi) + 0.5 * safelog(det(ZSigma0[n][:, :, i])) - 0.5 * \
-                           np.trace(ZSigma0[n][:, :, i].dot(ZSigma[n][:, :, i])) - 0.5 * \
-                           np.dot(np.expand_dims(Z[n][i, :], 0), ZSigma0[n][:, :, i]).dot(np.expand_dims(Z[n][i, :], 1))
+                  temp2 += - 0.5 * np.trace(inv(ZSigma0[n][:, :, i]).dot(ZSigma[n][:, :, i])) \
+                        - 0.5 * np.dot(np.expand_dims(Z[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z[n][i, :], 1)) \
+                        + np.dot(np.expand_dims(Z[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0[n][i, :], 1))
+                        # -0.5 * np.dot(np.expand_dims(Z0[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0[n][i, :], 1)) const
+                        # -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0[n][:, :, i])) const
 
-            temp2 += -0.5 * R * safelog(2 * pi) + 0.5 * safelog(det(ZSigma0_t[:, :, t])) - 0.5 * \
-                           np.trace(ZSigma0_t[:, :, t].dot(ZSigma_t[:, :, t])) - 0.5 * \
-                           np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), ZSigma0_t[:, :, t]).dot(np.reshape(Z_t[t, :], [R, 1])))
+            temp2 += - 0.5 * np.trace(inv(ZSigma0_t[:, :, t]).dot(ZSigma_t[:, :, t])) \
+                    - 0.5 * np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), inv(ZSigma0_t[:, :, t])).dot(np.reshape(Z_t[t, :], [R, 1]))) \
+                    + np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), inv(ZSigma0_t[:, :, t])).dot(np.reshape(Z0_t[t, :], [R, 1])))
+                    # -0.5 * np.dot(np.expand_dims(Z0_t[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0_t[n][i, :], 1)) const no infuluence for convergence check.
+                    # -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0_t[:, :, t]))
 
-            temp3 = -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0) + (a_tau0 - 1) * (
-                        digamma(a_tauN) - safelog(b_tauN)) \
-                    - b_tau0 * (a_tauN / b_tauN)
+            # E_q[lnp(\tau)]
+            temp3 = (a_tau0 - 1) * (digamma(a_tauN) - safelog(b_tauN)) - b_tau0 * (a_tauN / b_tauN)
+                    # -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0)
 
-            temp4 = 0
+            # E_q[lnq(A)]
+            temp4 = 0 
             for n in range(N-1):
-                for i in range(ZSigma[n].shape[2]):
-                    temp4 += 0.5 * safelog(np.linalg.det(ZSigma[n][:, :, i])) + 0.5 * R * (1 + safelog(2 * pi))
+                for i in range(dimY[n]):
+                    temp4 += 0.5 * safelog(det(ZSigma[n][:, :, i]))
+                        #+ 0.5 * R * (1 + safelog(2 * pi))
 
-            temp4 += 0.5 * safelog(np.linalg.det(ZSigma_t[:, :, t])) + 0.5 * R * (1 + safelog(2 * pi))
+            temp4 += 0.5 * safelog(det(ZSigma_t[:, :, t]))
+                    #+ 0.5 * R * (1 + safelog(2 * pi))
 
+            # -E_q[lnq(\tau)]
             temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN
 
-            temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
+            #E_q[lnp(\mathcal{E})]
+            temp6 = - 0.5 * np.sum(sigma_E0 * (np.square(E) + np.reciprocal(sigma_E)))
+                  # -0.5 * nObs * safelog(2 * pi) + 0.5 * np.sum(safelog(sigma_E0))
 
-            temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] + np.square(E[:, :, t]))/sigma_E[:, :, t])
+            # -E_q[lnq(\mathcal{E})]
+            temp7 = - 0.5 * np.sum(safelog(sigma_E))
+                    # + 0.5 * (nObs * safelog(2 * pi) + nObs)
+
+            # temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) \
+            #     - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] \
+            #         + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
+
+            # temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) \
+            #     + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] \
+            #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
+
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
             # Display progress
@@ -242,12 +268,13 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
             else:
                 LBRelChan = 0
             #
-            # if verbose:
-            #     print('Iter. %d: RelChan = %g' % (it, LBRelChan))
-            # Convergence check
-            if it > 5 and (abs(LBRelChan) < tol):
-                #print('======= Converged===========')
-                break
+            if verbose:
+                print('Iter. %d: RelChan = %g' % (it, LBRelChan))
+                # Convergence check
+                if it > 5 and (abs(LBRelChan) < tol):
+                    print('======= Converged===========')
+                    break
+
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
         #false_locations.append(locations)
         count += TPR

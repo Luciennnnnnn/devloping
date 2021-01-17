@@ -199,7 +199,6 @@ def update(Y, O, params, N, maxRank, maxiters, tol=1e-5, verbose=0):
 
 
 def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='rand'):
-    print(init)
     R = maxRank
     dimY = Y.shape
     N = Y.ndim
@@ -247,7 +246,6 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='rand'):
     W = 2016
 
     for t in range(T):
-        #print(t)
         #  Model learning
         coefficient = []
         EZZT_t_pre = []

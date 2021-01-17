@@ -146,7 +146,7 @@ def update(Y, O, params, N, maxRank, maxiters, tol=1e-5, verbose=0):
             E = (sigma_E * (E0 / sigma_E0 + tau * (C - np.expand_dims(X, axis=2))))
 
             temp1 = -0.5 * nObs * safelog(2 * pi) + 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) \
-                    - 0.5 * tau * err
+                    - 0.5 * tau * err # first term, Y
             for i in range(len(coefficient)):
                 temp1 += coefficient[i] * (-0.5 * np.sum(O_pre[i]) * safelog(2 * pi) + 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) \
                     - 0.5 * tau * errs[i])
@@ -173,13 +173,12 @@ def update(Y, O, params, N, maxRank, maxiters, tol=1e-5, verbose=0):
 
             temp4 += 0.5 * safelog(np.linalg.det(ZSigma_t)) + 0.5 * R * (1 + safelog(2 * pi))
 
-            temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN
+            temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN # -E_q[lnq(\tau)]
 
-            temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(
-                0.5 * safelog(sigma_E0) - 0.5 * (np.square(E) + sigma_E - 2 * E * E + np.square(E0)) / sigma_E0)
+            temp6 = -0.5 * nObs * safelog(2 * pi) + 0.5 * np.sum(
+                 safelog(sigma_E0) - sigma_E0 * (np.square(E) + np.reciprocal(sigma_E))) #E_q[lnp(\mathcal{E})]
 
-            temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(
-                0.5 * safelog(sigma_E) + 0.5 * (np.square(E) + sigma_E - 2 * E * E0 + np.square(E)) / sigma_E)
+            temp7 = 0.5 * (nObs * safelog(2 * pi)  + nObs) -0.5 *  np.sum(safelog(sigma_E)) #-E_q[lnq(\mathcal{E})]
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
             # Display progress
@@ -202,7 +201,7 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     R = maxRank
     dimY = Y.shape
     N = Y.ndim
-    T = dimY[2]
+    T = dimY[N-1]
     outliers_count = np.sum(outliers_p, (0, 1))
     # Initialization
     a_tauN = 1e-6
@@ -246,7 +245,6 @@ def BCPF_IC(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=1, init='ml'):
     W = 2016
 
     for t in range(T):
-        #print(t)
         #  Model learning
         coefficient = []
         EZZT_t_pre = []
