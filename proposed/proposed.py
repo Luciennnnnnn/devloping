@@ -182,11 +182,11 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             m_k = s_k2 * np.sum(phi * np.expand_dims(E[:, :, t], 2).repeat(K, 2), (0, 1))
 
             # update Gaussian assign
-            print(np.expand_dims(m_k, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1).shape)
-            print((np.square(E[:, :, t]) + np.expand_dims(sigma_E[:, :, t], 2)).repeat(K, 2).shape)
+            #print(np.expand_dims(m_k, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1).shape)
+            #print(np.expand_dims(np.square(m_k) + s_k2, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1).shape)
             phi = np.expand_dims(m_k, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1) \
                 * np.expand_dims(E[:, :, t], 2).repeat(K, 2) \
-                - 0.5 * (np.square(E[:, :, t]) + np.expand_dims(sigma_E[:, :, t], 2)).repeat(K, 2)
+                - 0.5 * np.expand_dims(np.square(m_k) + s_k2, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1)
             # calculate lowerbound
 
             # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
