@@ -76,7 +76,7 @@ def generator(dataset_name, parameters):
             j = x % DIM[1]
             a[i, j, k] += outlier_noise[i, j, k]
     elif parameters['noise_scheme'] == "mixture":
-        outlier_noise = np.random.uniform(-5, 5, (DIM[0], DIM[1], DIM[2])) # 10%
+        outlier_noise = np.random.uniform(-0.5, 0.5, (DIM[0], DIM[1], DIM[2])) # 10%
         gaussian_noise_1 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 30%
         gaussian_noise_2 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 20%
         # rvs(b, loc=0, scale=1, size=1, random_state=None)
@@ -108,6 +108,8 @@ def generator(dataset_name, parameters):
     #Add outliers
     if parameters['outliers_scheme'] == "Gaussian":
         outliers = np.random.randn(DIM[0], DIM[1], DIM[2]) * sqrt(sigma) + mu
+    elif parameters['outliers_scheme'] == "Exponential":
+        outliers = np.random.exponential(scale=0.5, size=(DIM[0], DIM[1], DIM[2]))
     elif parameters['outliers_scheme'] == "levy_stable":
         outliers = levy_stable.rvs(sigma, mu, size=(DIM[0], DIM[1], DIM[2]))
 

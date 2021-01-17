@@ -1,13 +1,17 @@
 from T_online import *
-sys.path.append("../..")
+sys.path.append("../")
 from utils import *
 Rs = {'Abilene': 12, 'GEANT': 12, 'CERNET': 12, 'VData50': 12, 'VData100': 12, 'VData200': 12, 'VData300': 12, 'VData400': 12, 'VData500': 12}
 Ws = {'Abilene': 2016, 'GEANT': 672, 'CERNET': 2016, 'VData50': 224, 'VData100': 224, 'VData200': 224, 'VData300': 224, 'VData400': 224, 'VData500': 224}
 
 
-def evaluate(dataset_name, ed, fraction, mu, sigma, R, distribution="Gaussian", SNR=None, init="svd"):
+def evaluate(dataset_name, parameters):
     # Run BayesCP
-    Y, outliers_p = generator(dataset_name, fraction, mu, sigma, distribution=distribution, SNR=SNR)
+    ed = parameters['ed']
+    R = parameters['R']
+    init = parameters['init']
+    Y, outliers_p = generator(dataset_name, parameters)
+
     if ed == None:
         ed = Y.shape[2]
     Y = Y[:, :, 0:ed]
@@ -95,12 +99,13 @@ def eval_sigma(dataset_name):
         FD.write(json.dumps(FPRS))
 
 
-def eval_ratio(dataset_name):
+def eval_ratio(dataset_name, parameters):
     TPRS = []
     FPRS = []
 
     for fraction in range(1, 6, 1):
-        model = evaluate(dataset_name, 8000, fraction / 100, 0, 0.1, Rs[dataset_name])
+        parameters['fraction'] = fraction
+        model = evaluate(dataset_name, parameters)
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
 
