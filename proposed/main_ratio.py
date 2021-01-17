@@ -6,8 +6,8 @@ if __name__ == '__main__':
     # run experiment for metrics outliers ratio
     
     parser = argparse.ArgumentParser(description='dd')
-    parser.add_argument('noise_scheme', type=str, default=None)
-    parser.add_argument('outliers_scheme', type=str, default='Gaussian')
+    parser.add_argument('--noise_scheme', type=str, default=None)
+    parser.add_argument('--outliers_scheme', type=str, default='Gaussian')
 
     args = parser.parse_args()
 
