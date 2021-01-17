@@ -89,7 +89,10 @@ def eval_ratio(dataset_name, parameters):
 
     for fraction in range(1, 11, 1):
         parameters['fraction'] = fraction / 100
+        start = time.time()
         model = evaluate(dataset_name, parameters)
+        end = time.time()
+        print("one:", end - start)
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
         #if fraction == 10:
