@@ -82,13 +82,12 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
     sigma_E = np.ones_like(sigma_E0) # \overline{\zeta}, posterior precision of \mathcal{E}
     E = np.zeros_like(E0) # \overline{\mathcal{E}}, posterior mean of \mathcal{E}
 
-    mu = np.ones([K, 1]) # mean of gaussian component
+    #mu = np.ones([K, 1]) # mean of gaussian component
     zeta = 1e-6 # prior precision of mean of gaussian component
-    m_k = np.ones(K) # posterior mean of mean of gaussian component
+    m_k = np.zeros(K) # posterior mean of mean of gaussian component
     s_k2 = np.ones(K) # posterior variance of mean of gaussian component
-    Cat = np.ones([dimY[0], dimY[1], K]) # indicator vector
-    phi = np.ones([dimY[0], dimY[1], K]) # posterior probability distribution of C
-
+    #Cat = np.ones([dimY[0], dimY[1], K]) # indicator vector
+    
     RSE = []
     TPRS = []
     FPRS = []
@@ -97,7 +96,8 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
     nObs = np.prod(dimY[0:2])
     O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
-        print(t)
+        if verbose and t % 400 == 0:
+            print(t)
         #  Model learning
         LB = []
         #if init == 'rand':
@@ -111,6 +111,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
         #ZSigma_t = np.eye(R)
 
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
+        phi = np.ones([dimY[0], dimY[1], K]) / K # posterior probability distribution of C
 
         #sigma_E0 = np.ones([dimY[0], dimY[1], 1])
         #E0 = np.zeros([dimY[0], dimY[1], 1])
@@ -178,10 +179,12 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
             # Update mean of Gaussian component
             s_k2 = np.reciprocal(zeta + np.sum(phi, (0, 1)))
-            m_k = s_k2 * np.sum(phi*E[:, :, t], (0, 1))
+            m_k = s_k2 * np.sum(phi * np.expand_dims(E[:, :, t], 2).repeat(K, 2), (0, 1))
 
             # update Gaussian assign
-            phi = m_k * E[:, :, t] - 0.5 * (np.squrae(E[:, :, t]) + sigma_E[:, :, t])
+            phi = np.expand_dims(m_k, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1) \
+                * np.expand_dims(E[:, :, t], 2).repeat(K, 2) \
+                - 0.5 * (np.squrae(E[:, :, t]) + np.expand_dims(sigma_E[:, :, t]), 2).repeat(K, 2)
             # calculate lowerbound
 
             # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
@@ -223,8 +226,8 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
             #E_q[lnp(\mathcal{E} | \mathcal{C}, \mu)]
             temp6 = - 0.5 * np.sum(np.square(E[:, :, t]) + sigma_E[:, :, t])\
-                + np.sum(E[:, :, t] * phi[:, :] * m_k)\
-                - 0.5 * np.sum(phi[:, :] * (np.square(m_k) + s_k2))
+                + np.sum(E[:, :, t] * np.dot(phi, m_k))\
+                - 0.5 * np.sum(np.dot(phi, np.square(m_k) + s_k2))
                   # -0.5 * nObs * safelog(2 * pi)
 
             # -E_q[lnq(\mathcal{E})]
@@ -232,25 +235,19 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
                     # + 0.5 * (nObs * safelog(2 * pi) + nObs)
 
             # E_q[lnp(\mu)]
-            temp8 = -0.5 * zeta * np.sum(np.square(m_k) + s_k2) \
+            temp8 = -0.5 * zeta * np.sum(np.square(m_k) + s_k2)
                 #-0.5 * K * safelog(2 * pi) + 0.5 * K * safelog(zeta)
 
             # E_q[lnq(\mu)]
-            temp9 = 0.5 * np.sum(safelog(s_k2)) \
+            temp9 = 0.5 * np.sum(safelog(s_k2))
                 #+ 0.5 * K * (1 + safelog(2 * pi))
 
             # E_q[lnp(\mathcal{C})]
-            temp10 = 0 \
-                - nObs * safelog(K)
+            temp10 = 0
+                #- nObs * safelog(K)
+
             # E_q[lnq(\mathcal{C})]
             temp11 = -np.sum(phi * safelog(phi))
-            # temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) \
-            #     - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] \
-            #         + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
-
-            # temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) \
-            #     + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] \
-            #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
 
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7 + temp8 + temp9 + temp10 + temp11)
 
@@ -262,7 +259,8 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             #
             if verbose:
                 print('Iter. %d: RelChan = %g' % (it, LBRelChan))
-                # Convergence check
+            
+            # Convergence check
             if it > 5 and (abs(LBRelChan) < tol):
                 if verbose:
                     print('======= Converged===========')
@@ -286,12 +284,10 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
     model = {}
     # Output
-    #model['X'] = X
     #model['RSE'] = RSE
     model['TPRS'] = TPRS
     model['FPRS'] = FPRS
     model['precision'] = count / T
     model['FPR'] = np.sum(FPRS) / T
-    #model['ZSigma'] = ZSigma
     #model['false_locations'] = false_locations
     return model
