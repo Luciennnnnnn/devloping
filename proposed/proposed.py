@@ -155,7 +155,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
                              np.reshape(ZSigma_t[:, :, t], [R*R, 1], 'F')).T
 
             # Update latent tensor X
-            X = np.squeeze(tl.cp_to_tensor([Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)]))   #
+            X = np.squeeze(tl.cp_to_tensor((_, [Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)])))   #
 
             #  The most time and space consuming part
             EX2 = np.dot(np.dot(tensor_to_vec(O).T, khatri_rao([EZZT[0], EZZT[1],
