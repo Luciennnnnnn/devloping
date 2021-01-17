@@ -104,7 +104,7 @@ def eval_ratio(dataset_name, parameters):
     FPRS = []
 
     for fraction in range(1, 6, 1):
-        parameters['fraction'] = fraction
+        parameters['fraction'] = fraction / 100
         model = evaluate(dataset_name, parameters)
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
