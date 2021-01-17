@@ -17,7 +17,7 @@ import scipy.signal
 from numpy.linalg import norm, svd, inv, det
 import matplotlib
 matplotlib.use('Agg')
-sys.path.append("../..")
+sys.path.append("../")
 
 from utils import *
 
@@ -127,6 +127,7 @@ def VITAD(Y, outliers_p, maxRank, maxiters, tol=1e-5, verbose=True, init='ml'):
     nObs = np.prod(dimY[0:2])
     O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
+        print(t)
         #  Model learning
         LB = []
         #if init == 'rand':
