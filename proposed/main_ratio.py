@@ -13,9 +13,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.noise_scheme == None:
         print('None')
-        
+    print(args.noise_scheme)
+    print(args.outliers_scheme)
     parameters = {"ed": 8000, "R":6, "K":6, "mu":0, "sigma":0.1, 
-                "SNR":None, "noise_scheme": args.None, 'outliers_scheme': args.outliers_scheme}
+                "SNR":None, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     start = time.time()
     eval_ratio('Abilene', parameters)
     end = time.time()
