@@ -5,6 +5,7 @@ import heapq
 import copy
 import json
 import sys
+import logging
 from math import pi, pow, sqrt, log, log10
 import numpy as np
 import tensorly as tl
@@ -20,7 +21,8 @@ matplotlib.use('Agg')
 sys.path.append("../")
 
 from utils import *
-
+logging.basicConfig(filename=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
+        format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 
 def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
     R = maxRank
@@ -96,8 +98,8 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
     nObs = np.prod(dimY[0:2])
     O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
-        if verbose and t % 400 == 0:
-            print(t)
+        if t % 400 == 0:
+            logging.debug(t)
         #  Model learning
         LB = []
         #if init == 'rand':
@@ -258,14 +260,15 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
                 LBRelChan = abs(LB[it] - 2*LB[it-1] + LB[it-2])/-LB[1]
             else:
                 LBRelChan = 0
-            #
-            # if verbose:
-            #     print('Iter. %d: RelChan = %g' % (it, LBRelChan))
+            #print('Iter. %d: RelChan = %g' % (it, LBRelChan))
+            if t % 400 == 0:
+                logging.debug('Iter. %d: RelChan = %g' % (it, LBRelChan))
             
             # Convergence check
             if it > 5 and (abs(LBRelChan) < tol):
-                # if verbose:
-                #     print('======= Converged===========')
+                # print('======= Converged===========')
+                if t % 400 == 0:
+                    logging.debug('======= Converged %d===========' % (t, it))
                 break
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)

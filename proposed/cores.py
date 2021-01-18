@@ -99,10 +99,22 @@ def eval_ratio(dataset_name, parameters):
         #if fraction == 10:
         #    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/false_locations.json'), 'w') as FD:
         #        FD.write(json.dumps(model['false_locations']))
+    TPR_file_path = 'proposed/ratio'
+    FPR_file_path = 'proposed/ratio'
+    if parameters['noise_scheme'] != None:
+        TPR_file_path += '_' + parameters['noise_scheme']
+        FPR_file_path += '_' + parameters['noise_scheme']
 
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/ratio_' + parameters['noise_scheme'] + '_' + parameters['outliers_scheme'] + '_TPRS.json'), 'w') as FD:
+    if parameters['outliers_scheme'] != None:
+        TPR_file_path += '_' + parameters['outliers_scheme']
+        FPR_file_path += '_' + parameters['outliers_scheme']
+
+    TPR_file_path += '_TPRS.json'
+    FPR_file_path += '_FPRS.json'
+
+    with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
         FD.write(json.dumps(TPRS))
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/ratio_' + parameters['noise_scheme'] + '_' + parameters['outliers_scheme'] + '_FPRS.json'), 'w') as FD:
+    with open(os.path.join(os.path.join('../../results', dataset_name), FPR_file_path), 'w') as FD:
         FD.write(json.dumps(FPRS))
 
 
