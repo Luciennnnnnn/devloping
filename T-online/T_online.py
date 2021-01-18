@@ -98,7 +98,7 @@ def update(t, M, X, S, epsilon, maxiters, A_old, B_old, C_old, T_A1_old, T_A2_ol
     B = np.dot(T_B1, scipy.linalg.pinv(T_B2))
 
     S[:, :, t + T] = np.squeeze(np.expand_dims(M[:, :, t + T], axis=2) -
-                                tl.kruskal_to_tensor([A, B, np.expand_dims(C[-1, :], axis=0)], None))
+                                tl.cp_to_tensor((None, [A, B, np.expand_dims(C[-1, :], axis=0)])))
     p = topk2(S[:, :, t + T], epsilon[t + T], S.shape)
     S[:, :, t + T] = np.zeros([S.shape[0], S.shape[1]])
     for elem in p:
@@ -174,7 +174,7 @@ def update(t, M, X, S, epsilon, maxiters, A_old, B_old, C_old, T_A1_old, T_A2_ol
         #     print("B is inf", it)
 
         S[:, :, t + T] = np.squeeze(np.expand_dims(M[:, :, t + T], axis=2) -
-                                    tl.kruskal_to_tensor([A, B, np.expand_dims(C[-1, :], axis=0)], None))
+                                    tl.cp_to_tensor((None, [A, B, np.expand_dims(C[-1, :], axis=0)])))
         p = topk2(S[:, :, t + T], epsilon[t+T], S.shape)
         S[:, :, t+T] = np.zeros([S.shape[0], S.shape[1]])
         for elem in p:
