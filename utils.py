@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import heapq
+import logging
 from math import pi, pow, sqrt, log, log10
 import numpy as np
 import tensorly as tl
@@ -65,7 +66,7 @@ def generator(dataset_name, parameters):
     
     #Add noise
     if parameters['noise_scheme'] == "outlier":
-        outlier_noise = np.random.uniform(-5, 5, (DIM[0], DIM[1], DIM[2]))
+        outlier_noise = np.random.uniform(-0.5, 0.5, (DIM[0], DIM[1], DIM[2]))
         
         sampled_locations = np.random.choice(locations, int(len(locations) * 0.1), replace=False)
         # print(len(sampled_locations))
