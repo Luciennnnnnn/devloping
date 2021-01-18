@@ -22,4 +22,4 @@ if __name__ == '__main__':
     start = time.time()
     eval_ratio('Abilene', parameters)
     end = time.time()
-    logging.info('Time consumption in Abilene on ratio: %f' %(end - start)/60)
+    logging.info('Time consumption in Abilene on ratio: %f' %((end - start)/60))
