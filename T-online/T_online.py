@@ -5,6 +5,7 @@ import heapq
 import copy
 import json
 import sys
+import logging
 from math import pi, pow, sqrt, log, log10
 import numpy as np
 import tensorly as tl
@@ -18,6 +19,11 @@ import scipy.signal
 from numpy.linalg import norm, svd, inv, det, pinv
 import matplotlib
 
+log_dir = 'logs'
+if not os.path.exists(log_dir):
+    os.mkdir(log_dir)
+logging.basicConfig(filename='logs/' + time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
+        format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 
 def clean(serie):
     output = serie[(np.isnan(serie) == False) & (np.isinf(serie) == False)]

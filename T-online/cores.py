@@ -108,13 +108,27 @@ def eval_ratio(dataset_name, parameters):
         start = time.time()
         model = evaluate(dataset_name, parameters)
         end = time.time()
-        print('one:', end-start)
+        logging.info("one loop cost %f:" %(end - start)/60)
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
 
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'T-online/ratio_TPRS.json'), 'w') as FD:
+    TPR_file_path = 'T-online/ratio'
+    FPR_file_path = 'T-online/ratio'
+    if parameters['noise_scheme'] != None:
+        TPR_file_path += '_' + parameters['noise_scheme']
+        FPR_file_path += '_' + parameters['noise_scheme']
+
+    if parameters['outliers_scheme'] != None:
+        TPR_file_path += '_' + parameters['outliers_scheme']
+        FPR_file_path += '_' + parameters['outliers_scheme']
+
+    TPR_file_path += '_TPRS.json'
+    FPR_file_path += '_FPRS.json'
+    with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(TPR_file_path))
         FD.write(json.dumps(TPRS))
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'T-online/ratio_FPRS.json'), 'w') as FD:
+    with open(os.path.join(os.path.join('../../results', dataset_name), FPR_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(FPR_file_path))
         FD.write(json.dumps(FPRS))
 
 

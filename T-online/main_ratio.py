@@ -1,13 +1,18 @@
 from T_online import *
 from cores import *
-
+import argparse
 
 if __name__ == '__main__':
-    start = time.time()
-    
-    parameters = {"ed": 8000, "R":6, "mu":0, "sigma":0.1, "SNR": None, 
-                "noise_scheme": 'outlier', 'outliers_scheme': 'Gaussian', 'init': 'svd'}
+    parser = argparse.ArgumentParser(description='VITDA')
+    parser.add_argument('--noise_scheme', type=str, default=None)
+    parser.add_argument('--outliers_scheme', type=str, default='Gaussian')
 
+    args = parser.parse_args()
+
+    parameters = {"ed": 8000, "R":6, "mu":0, "sigma":0.1, "SNR": None, 
+                "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme, 'init': 'svd'}
+
+    start = time.time()
     eval_ratio('Abilene', parameters)
     end = time.time()
-    print('entire ratio-Abilene consumption :', end - start)
+    logging.info('Time consumption in Abilene on ratio: %f' %(end - start)/60)
