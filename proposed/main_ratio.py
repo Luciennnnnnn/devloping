@@ -22,7 +22,7 @@ if __name__ == '__main__':
     parameters = {"ed": ed, "R":R, "K":K, "mu":mu, "sigma":sigma, 
                 "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
-    logging.info('ed: %d, R: %d, K: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s, init: %s'%(ed, R, K, mu, sigma, args.noise_scheme, args.outliers_scheme))     
+    logging.info('ed: %d, R: %d, K: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, K, mu, sigma, args.noise_scheme, args.outliers_scheme))     
     start = time.time()
     eval_ratio('Abilene', parameters)
     end = time.time()
