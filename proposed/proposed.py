@@ -268,7 +268,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             if it > 5 and (abs(LBRelChan) < tol):
                 # print('======= Converged===========')
                 if t % 400 == 0:
-                    logging.debug('======= Converged %d===========' % (t, it))
+                    logging.debug('======= Converged (%d, %d)===========' % (t, it))
                 break
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
