@@ -22,7 +22,7 @@ sys.path.append("../")
 
 from utils import *
 
-log_dir = os.path.dirname(os.path.dirname(__file__))+'/logs'
+log_dir = 'logs'
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 logging.basicConfig(filename='logs/' + time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
