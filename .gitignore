@@ -1,6 +1,8 @@
 # MacOS
 .DS_Store
 
+nohup.out
+
 # sources
 *.jpg
 *.png
