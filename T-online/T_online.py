@@ -57,7 +57,7 @@ def DRMF(Y, epsilon, R, maxiters, init):
     S = np.zeros_like(Y)
     for it in range(maxiters):
         X = Y - S
-        kruskal_tensor = parafac(X, rank=R, n_iter_max=15, init=init)
+        _, kruskal_tensor = parafac(X, rank=R, n_iter_max=15, init=init)
         S = Y - tl.kruskal_to_tensor(kruskal_tensor)
         p = topk(S, epsilon, S.shape)
         S = np.zeros_like(X)
