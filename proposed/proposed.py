@@ -21,6 +21,10 @@ matplotlib.use('Agg')
 sys.path.append("../")
 
 from utils import *
+
+log_dir = os.path.dirname(os.path.dirname(__file__))+'/logs'
+if not os.path.exists(log_dir):
+    os.mkdir(log_dir)
 logging.basicConfig(filename='logs/' + time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
         format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 
