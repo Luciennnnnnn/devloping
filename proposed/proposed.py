@@ -21,7 +21,7 @@ matplotlib.use('Agg')
 sys.path.append("../")
 
 from utils import *
-logging.basicConfig(filename=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
+logging.basicConfig(filename='logs/' + time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
         format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 
 def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
