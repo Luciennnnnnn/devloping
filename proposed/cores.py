@@ -32,9 +32,12 @@ def eval_time(dataset_name, ed):
 def eval_R(dataset_name):
     TPRS = [[] for _ in range(2, 51, 2)]
     FPRS = [[] for _ in range(2, 51, 2)]
-    for i in range(10):
-        for R in range(2, 51, 2):
+    for i in range(1):
+        for R in range(2, 15, 2):
             model = evaluate(dataset_name, 8000, 0.1, 0, 0.1, R)
+            logging.info("one loop cost %f:" %((end - start)/60))
+            logging.debug("TPR %f:" %(model['precision']))
+            logging.debug("FPR %f:" %(model['FPR']))
             TPRS[i].append(model['precision'])
             FPRS[i].append(model['FPR'])
 
@@ -49,10 +52,28 @@ def eval_R(dataset_name):
         TPRS_mean.append(sum / 10)
         FPRS_mean.append(sum2 / 10)
 
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/R_TPRS.json'), 'w') as FD:
+    TPR_file_path = 'proposed/R'
+    FPR_file_path = 'proposed/R'
+    if parameters['noise_scheme'] != None:
+        TPR_file_path += '_' + parameters['noise_scheme']
+        FPR_file_path += '_' + parameters['noise_scheme']
+
+    if parameters['outliers_scheme'] != None:
+        TPR_file_path += '_' + parameters['outliers_scheme']
+        FPR_file_path += '_' + parameters['outliers_scheme']
+
+    TPR_file_path += '_TPRS.json'
+    FPR_file_path += '_FPRS.json'
+
+    if not os.path.exists(os.path.dirname(TPR_file_path)):
+        os.makedirs(os.path.dirname(TPR_file_path))
+        
+    with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
         FD.write(json.dumps(TPRS_mean))
-    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/R_FPRS.json'), 'w') as FD:
+        logging.info("write to file %s:" %(TPR_file_path))
+    with open(os.path.join(os.path.join('../../results', dataset_name), FPR_file_path), 'w') as FD:
         FD.write(json.dumps(FPRS_mean))
+        logging.info("write to file %s:" %(FPR_file_path))
 
 
 def eval_mu(dataset_name, noise_scheme='outlier', ed=None, file_prefix='mu'):
