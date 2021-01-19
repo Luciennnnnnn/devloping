@@ -43,7 +43,6 @@ def VITAD(Y, outliers_p, Omega, maxRank, K, maxiters, tol=1e-5, verbose=True, in
 
     Z0 = [] # A^n的先验的期望
     ZSigma0 = [] # A^n的先验的方差
-    X_C = np.zeros_like(Y)
 
     for n in range(N-1):
         if init == 'rand':
@@ -94,7 +93,6 @@ def VITAD(Y, outliers_p, Omega, maxRank, K, maxiters, tol=1e-5, verbose=True, in
     FPRS = []
     count = 0
     false_locations = []
-    O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
         if t % 400 == 0:
             logging.debug(t)
@@ -241,7 +239,6 @@ def VITAD(Y, outliers_p, Omega, maxRank, K, maxiters, tol=1e-5, verbose=True, in
         count += TPR
         #X = np.expand_dims(X, 2)
         #RSE.append(norm(C-X-E) / norm(C))
-        X_C[:, :, t] = X
         TPRS.append(TPR)
         FPRS.append(FPR)
         Z0 = copy.deepcopy(Z)
@@ -253,11 +250,10 @@ def VITAD(Y, outliers_p, Omega, maxRank, K, maxiters, tol=1e-5, verbose=True, in
 
     # Prepare the results
     #Z.append(Z_ST)
-    #X = tl.kruskal_to_tensor(Z) * dscale
 
     model = {}
     # Output
-    model['X'] = X_C
+    model['X'] = tl.cp_to_tensor((None, [Z[0], Z[1], Z_t]))
     #model['RSE'] = RSE
     model['TPRS'] = TPRS
     model['FPRS'] = FPRS
