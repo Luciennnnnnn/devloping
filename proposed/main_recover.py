@@ -9,7 +9,7 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='T-online')
     parser.add_argument('--noise_scheme', type=str, default=None)
-    parser.add_argument('--outliers_scheme', type=str, default='Gaussian')
+    parser.add_argument('--outliers_scheme', type=str, default=None)
 
     args = parser.parse_args()
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     sigma = 0.1
     theta = 0.1
     SNR = None
-    parameters = {"ed": ed, "R":R, "K":K, "mu":mu, "sigma":sigma, "theta": theta,
+    parameters = {"ed": ed, "R":R, "K":K, "mu":mu, "sigma":sigma, "theta": theta, "fraction": 0, 
                 "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
     logging.info('recover --- ed: %d, R: %d, K: %d, mu: %d, sigma: %f, theta: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, K, mu, sigma, theta, args.noise_scheme, args.outliers_scheme))     

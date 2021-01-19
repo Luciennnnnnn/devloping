@@ -76,7 +76,7 @@ def generator(dataset_name, parameters):
             omega[i, j, k] = 0
 
     #Add noise
-    if parameters['noise_scheme'] == "gaussian":
+    if parameters['noise_scheme'] == "Gaussian":
         gaussian_noise = np.random.normal(0, 0.01, (DIM[0], DIM[1], DIM[2])) # 100%
         a += gaussian_noise
     elif parameters['noise_scheme'] == "outlier":
