@@ -7,7 +7,7 @@ inits = {'Abilene': 'rand', 'GEANT': 'rand', 'CERNET': 'ml', 'VData50': 'rand', 
 
 def evaluate(dataset_name, parameters):
     # Run BayesCP
-    Y, outlier, outliers_p, omega = generator(dataset_name, parameters)
+    Y, outlier, outliers_p, Omega = generator(dataset_name, parameters)
     ed = parameters['ed']
     R = parameters['R']
     K = parameters['K']
@@ -15,8 +15,8 @@ def evaluate(dataset_name, parameters):
     Y = Y[:, :, 0:ed]
     outlier = outlier[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
-    omega = omega[:, :, 0:ed]
-    model = VITAD(Y=Y + outliers_p * outlier, outliers_p=outliers_p, O=omega, maxRank=R, K=K, maxiters=20, tol=1e-4, verbose=True, init=inits[dataset_name])
+    Omega = Omega[:, :, 0:ed]
+    model = VITAD(Y=Y + outliers_p * outlier, outliers_p=outliers_p, Omega=Omega, maxRank=R, K=K, maxiters=20, tol=1e-4, verbose=True, init=inits[dataset_name])
     model['ER'] = np.sum(np.square(model['X'] - Y)) / np.sum(np.square(Y))
     model['SRR'] = np.sum((model['X'] - Y) / Y <= theta) / np.prod(Y.shape)
     return model
