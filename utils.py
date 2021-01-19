@@ -59,7 +59,7 @@ def generator(dataset_name, parameters):
     b = np.zeros_like(a, dtype=bool)
     omega = np.ones_like(a)
     DIM = a.shape
-    
+
     locations = list(range(np.prod(DIM)))
 
     sigma = parameters['sigma']
@@ -68,6 +68,7 @@ def generator(dataset_name, parameters):
     missing_ratio = parameters['missing_ratio']
     # missing..
     if missing_ratio != 0:
+        print("111")
         missing_locations = np.random.choice(locations, int(len(locations) * missing_ratio), replace=False)
         for x in missing_locations:
             k = x // (DIM[0] * DIM[1])
@@ -79,9 +80,11 @@ def generator(dataset_name, parameters):
     noises = np.zeros_like(a)
     #Add noise
     if parameters['noise_scheme'] == "Gaussian":
+        print("noise_scheme Gaussian")
         gaussian_noise = np.random.normal(0, 0.01, (DIM[0], DIM[1], DIM[2])) # 100%
         noises += gaussian_noise
     elif parameters['noise_scheme'] == "outlier":
+        print("noise_scheme outlier")
         outlier_noise = np.random.uniform(-0.05, 0.05, (DIM[0], DIM[1], DIM[2]))
         
         sampled_locations = np.random.choice(locations, int(len(locations) * 0.1), replace=False)
@@ -93,6 +96,7 @@ def generator(dataset_name, parameters):
             j = x % DIM[1]
             noises[i, j, k] += outlier_noise[i, j, k]
     elif parameters['noise_scheme'] == "mixture":
+        print("noise_scheme mixture")
         outlier_noise = np.random.uniform(-0.05, 0.05, (DIM[0], DIM[1], DIM[2])) # 10%
         gaussian_noise_1 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 30%
         gaussian_noise_2 = np.random.normal(0, 0.2, (DIM[0], DIM[1], DIM[2])) # 20%
@@ -127,6 +131,7 @@ def generator(dataset_name, parameters):
     inject_outliers = np.zeros_like(a)
 
     if parameters['outliers_scheme'] == "Gaussian":
+        print("outliers_scheme Gaussian")
         if fraction != 0:
             outliers = np.random.randn(DIM[0], DIM[1], DIM[2]) * sqrt(sigma) + mu
             sampled_locations = np.random.choice(locations, int(len(locations) * fraction), replace=False)
@@ -139,6 +144,7 @@ def generator(dataset_name, parameters):
                 inject_outliers[i, j, k] += outliers[i, j, k]
 
     elif parameters['outliers_scheme'] == "Exponential":
+        print("outliers_scheme Exponential")
         if fraction != 0:
             outliers = np.random.exponential(scale=0.5, size=(DIM[0], DIM[1], DIM[2]))
             sampled_locations = np.random.choice(locations, int(len(locations) * fraction), replace=False)
@@ -150,6 +156,7 @@ def generator(dataset_name, parameters):
                 b[i, j, k] = 1
                 inject_outliers[i, j, k] += outliers[i, j, k]
     elif parameters['outliers_scheme'] == "structural":
+        print("outliers_scheme structural")
         outliers = np.random.uniform(0, 5, (DIM[0], DIM[1], DIM[2]))
         cur_locations = list(range(DIM[0], DIM[1]))
         for t in range(DIM[2]):
@@ -161,6 +168,7 @@ def generator(dataset_name, parameters):
                 inject_outliers[i, j, t] += outliers[i, j, t]
 
     elif parameters['outliers_scheme'] == "random":
+        print("outliers_scheme random")
         outliers = np.random.uniform(0, 5, (DIM[0], DIM[1], DIM[2]))
         sampled_locations = np.random.choice(locations, int(len(locations) * 0.01), replace=False)
         for x in sampled_locations:
