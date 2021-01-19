@@ -38,6 +38,7 @@ def eval_R(dataset_name, parameters):
             start = time.time()
             model = evaluate(dataset_name, parameters)
             end = time.time()
+            logging.info("dataset: %s" %(dataset_name))
             logging.info("one loop cost %f:" %((end - start)/60))
             logging.debug("Rank: %d, TPR %f:" %(parameters['R'], model['precision']))
             logging.debug("Rank: %d, FPR %f:" %(parameters['R'], model['FPR']))
@@ -68,8 +69,8 @@ def eval_R(dataset_name, parameters):
     TPR_file_path += '_TPRS.json'
     FPR_file_path += '_FPRS.json'
 
-    if not os.path.exists(os.path.dirname(TPR_file_path)):
-        os.makedirs(os.path.dirname(TPR_file_path))
+    if not os.path.exists(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path))):
+        os.makedirs(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path)))
 
     with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
         FD.write(json.dumps(TPRS_mean))
@@ -118,6 +119,7 @@ def eval_ratio(dataset_name, parameters):
         start = time.time()
         model = evaluate(dataset_name, parameters)
         end = time.time()
+        logging.info("dataset: %s" %(dataset_name))
         logging.info("one loop cost %f:" %((end - start)/60))
         logging.debug("TPR %f:" %(model['precision']))
         logging.debug("FPR %f:" %(model['FPR']))
@@ -139,8 +141,8 @@ def eval_ratio(dataset_name, parameters):
     TPR_file_path += '_TPRS.json'
     FPR_file_path += '_FPRS.json'
 
-    if not os.path.exists(os.path.dirname(TPR_file_path)):
-        os.makedirs(os.path.dirname(TPR_file_path))
+    if not os.path.exists(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path))):
+        os.makedirs(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path)))
         
     with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
         logging.info("write to file %s:" %(TPR_file_path))

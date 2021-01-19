@@ -79,7 +79,7 @@ def generator(dataset_name, parameters):
     elif parameters['noise_scheme'] == "mixture":
         outlier_noise = np.random.uniform(-0.5, 0.5, (DIM[0], DIM[1], DIM[2])) # 10%
         gaussian_noise_1 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 30%
-        gaussian_noise_2 = np.random.normal(0, 0.1, (DIM[0], DIM[1], DIM[2])) # 20%
+        gaussian_noise_2 = np.random.normal(0, 0.2, (DIM[0], DIM[1], DIM[2])) # 20%
         # rvs(b, loc=0, scale=1, size=1, random_state=None)
         expoential_power_noise = exponpow.rvs(0.5, loc=0, scale=0.1, size=(DIM[0], DIM[1], DIM[2]), random_state=None) # 20%
 
