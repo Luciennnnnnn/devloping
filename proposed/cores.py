@@ -35,7 +35,9 @@ def eval_R(dataset_name, parameters):
     for i in range(1):
         for R in range(2, 15, 2):
             parameters['R'] = R
+            start = time.time()
             model = evaluate(dataset_name, parameters)
+            end = time.time()
             logging.info("one loop cost %f:" %((end - start)/60))
             logging.debug("TPR %f:" %(model['precision']))
             logging.debug("FPR %f:" %(model['FPR']))
