@@ -67,6 +67,7 @@ def generator(dataset_name, parameters):
     fraction = parameters['fraction']
     missing_ratio = parameters['missing_ratio']
     # missing..
+    print("asdasdas")
     if missing_ratio != 0:
         print("111")
         missing_locations = np.random.choice(locations, int(len(locations) * missing_ratio), replace=False)
