@@ -10,7 +10,7 @@ def evaluate(dataset_name, parameters):
     ed = parameters['ed']
     R = parameters['R']
     init = parameters['init']
-    Y, outliers_p = generator(dataset_name, parameters)
+    Y, outlier, outliers_p, Omega = generator(dataset_name, parameters)
 
     if ed == None:
         ed = Y.shape[2]
@@ -137,6 +137,66 @@ def eval_ratio(dataset_name, parameters):
         logging.info("write to file %s:" %(FPR_file_path))
         FD.write(json.dumps(FPRS))
 
+def eval_missing_ratio(dataset_name, parameters):
+    TPRS = []
+    FPRS = []
+    ERS = []
+    SRRS = []
+    for fraction in range(0, 10):
+        parameters['missing_ratio'] = fraction / 10
+        start = time.time()
+        model = evaluate(dataset_name, parameters)
+        end = time.time()
+        logging.info("dataset: %s, missing_ratio: %s" %(dataset_name, parameters['missing_ratio']))
+        logging.info("one loop cost %f:" %((end - start)/60))
+        logging.debug("TPR %f:" %(model['precision']))
+        logging.debug("FPR %f:" %(model['FPR']))
+        logging.debug("ER %f:" %(model['ER']))
+        logging.debug("SRR %f:" %(model['SRR']))
+        TPRS.append(model['precision'])
+        FPRS.append(model['FPR'])
+        ERS.append(model['ER'])
+        SRRS.append(model['SRR'])
+        #if fraction == 10:
+        #    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/false_locations.json'), 'w') as FD:
+        #        FD.write(json.dumps(model['false_locations']))
+    TPR_file_path = 'T-online/missing_ratio'
+    FPR_file_path = 'T-online/missing_ratio'
+    ER_file_path = 'T-online/missing_ratio'
+    SRR_file_path = 'T-online/missing_ratio'
+    if parameters['noise_scheme'] != None:
+        TPR_file_path += '_' + parameters['noise_scheme']
+        FPR_file_path += '_' + parameters['noise_scheme']
+        ER_file_path += '_' + parameters['noise_scheme']
+        SRR_file_path += '_' + parameters['noise_scheme']
+
+
+    if parameters['outliers_scheme'] != None:
+        TPR_file_path += '_' + parameters['outliers_scheme']
+        FPR_file_path += '_' + parameters['outliers_scheme']
+        ER_file_path += '_' + parameters['outliers_scheme']
+        SRR_file_path += '_' + parameters['outliers_scheme']
+
+    TPR_file_path += '_TPRS.json'
+    FPR_file_path += '_FPRS.json'
+    ER_file_path += '_ERS.json'
+    SRR_file_path += '_SRRS.json'
+
+    if not os.path.exists(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path))):
+        os.makedirs(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path)))
+        
+    with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(TPR_file_path))
+        FD.write(json.dumps(TPRS))
+    with open(os.path.join(os.path.join('../../results', dataset_name), FPR_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(FPR_file_path))
+        FD.write(json.dumps(FPRS))
+    with open(os.path.join(os.path.join('../../results', dataset_name), ER_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(ER_file_path))
+        FD.write(json.dumps(ERS))
+    with open(os.path.join(os.path.join('../../results', dataset_name), SRR_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(SRR_file_path))
+        FD.write(json.dumps(SRRS))
 
 def eval_ratio2(dataset_name, init="random"):
     print('eval_ratio2')
