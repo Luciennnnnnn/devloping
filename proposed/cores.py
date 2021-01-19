@@ -39,8 +39,8 @@ def eval_R(dataset_name, parameters):
             model = evaluate(dataset_name, parameters)
             end = time.time()
             logging.info("one loop cost %f:" %((end - start)/60))
-            logging.debug("TPR %f:" %(model['precision']))
-            logging.debug("FPR %f:" %(model['FPR']))
+            logging.debug("Rank: %d, TPR %f:" %(parameters['R'], model['precision']))
+            logging.debug("Rank: %d, FPR %f:" %(parameters['R'], model['FPR']))
             TPRS[i].append(model['precision'])
             FPRS[i].append(model['FPR'])
 
