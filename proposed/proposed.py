@@ -28,7 +28,7 @@ if not os.path.exists(log_dir):
 logging.basicConfig(filename='logs/' + time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
         format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 
-def VITAD(Y, outliers_p, O, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
+def VITAD(Y, outliers_p, Omega, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
     R = maxRank
     dimY = Y.shape
     N = Y.ndim
@@ -100,8 +100,8 @@ def VITAD(Y, outliers_p, O, maxRank, K, maxiters, tol=1e-5, verbose=True, init='
             logging.debug(t)
         #  Model learning
         LB = []
-        
-        nObs = np.sum(O[:, :, t])
+        O = np.expand_dims(Omega[:, :, t], axis=2)
+        nObs = np.sum(O)
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
 
         C = np.expand_dims(Y[:, :, t], 2)
