@@ -106,25 +106,9 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             logging.debug(t)
         #  Model learning
         LB = []
-        #if init == 'rand':
-        #Z0_t = np.random.randn(1, R)
-        #Z_t = np.random.randn(1, R)
-        # elif init == 'ml':
-        #     Z0_t = np.expand_dims(z_tmp[t, :], axis=0)
-        #     Z_t = np.expand_dims(z_tmp[t, :], axis=0)
-
-        #ZSigma0_t = np.expand_dims(np.eye(R), 2)
-        #ZSigma_t = np.eye(R)
 
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
         phi = np.ones([dimY[0], dimY[1], K]) / K # posterior probability distribution of C
-
-        #sigma_E0 = np.ones([dimY[0], dimY[1], 1])
-        #E0 = np.zeros([dimY[0], dimY[1], 1])
-        #E0 = np.random.randn(dimY[0], dimY[1], 1)
-
-        #E = np.zeros_like(E0)
-        #sigma_E = np.ones_like(sigma_E0)
 
         C = np.expand_dims(Y[:, :, t], 2)
         a_tauN = 1e-6
@@ -167,7 +151,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             EX2 = np.dot(np.dot(tensor_to_vec(O).T, khatri_rao([EZZT[0], EZZT[1],
                                 EZZT_t], reverse=bool)), np.ones([R * R, 1]))
 
-            EE2 = np.sum(np.square(E[:, :, t]) + sigma_E[:, :, t])
+            EE2 = np.sum(np.square(E[:, :, t]) + np.reciprocal(sigma_E[:, :, t]))
             err = np.dot(tensor_to_vec(C).T, tensor_to_vec(C)) \
                     - 2 * tensor_to_vec(C).T.dot(tensor_to_vec(X)) \
                     - 2*np.dot(tensor_to_vec(C).T, tensor_to_vec(E[:, :, t])) \
