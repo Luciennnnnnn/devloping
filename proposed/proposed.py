@@ -239,6 +239,8 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
         count += TPR
         #X = np.expand_dims(X, 2)
         if t % 400 == 0:
+            print(np.squeeze(C))
+            print(X)
             logging.debug('t: %d, RSE: %f' % (t, norm(np.squeeze(C)-X-E[:, :, t]) / norm(C)))
         TPRS.append(TPR)
         FPRS.append(FPR)
