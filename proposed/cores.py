@@ -7,12 +7,12 @@ inits = {'Abilene': 'rand', 'GEANT': 'rand', 'CERNET': 'ml', 'VData50': 'rand', 
 
 def evaluate(dataset_name, parameters):
     # Run BayesCP
-    Y, outlier, outliers_p, Omega = generator(dataset_name, parameters)
+    Y, outliers, outliers_p, Omega = generator(dataset_name, parameters)
     ed = parameters['ed']
     R = parameters['R']
     theta = parameters['theta']
     Y = Y[:, :, 0:ed]
-    outlier = outlier[:, :, 0:ed]
+    outliers = outliers[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
     Omega = Omega[:, :, 0:ed]
     #noises = noises[:, :, 0:ed]
