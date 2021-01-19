@@ -139,6 +139,8 @@ def eval_ratio(dataset_name, parameters):
         logging.info("one loop cost %f:" %((end - start)/60))
         logging.debug("TPR %f:" %(model['precision']))
         logging.debug("FPR %f:" %(model['FPR']))
+        logging.debug("ER %f:" %(model['ER']))
+        logging.debug("SRR %f:" %(model['SRR']))
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
         #if fraction == 10:

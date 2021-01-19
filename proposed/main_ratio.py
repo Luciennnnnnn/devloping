@@ -7,7 +7,7 @@ import argparse
 if __name__ == '__main__':
     # run experiment for metrics outliers ratio
     
-    parser = argparse.ArgumentParser(description='T-online')
+    parser = argparse.ArgumentParser(description='outlier_ratio_experiment')
     parser.add_argument('--noise_scheme', type=str, default=None)
     parser.add_argument('--outliers_scheme', type=str, default='Gaussian')
     parser.add_argument('--theta', type=float, default=0.1)
