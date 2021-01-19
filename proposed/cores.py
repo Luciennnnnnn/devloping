@@ -29,12 +29,13 @@ def eval_time(dataset_name, ed):
         FD.write(json.dumps(model['RSE']))
 
 
-def eval_R(dataset_name):
+def eval_R(dataset_name, parameters):
     TPRS = [[] for _ in range(2, 51, 2)]
     FPRS = [[] for _ in range(2, 51, 2)]
     for i in range(1):
         for R in range(2, 15, 2):
-            model = evaluate(dataset_name, 8000, 0.1, 0, 0.1, R)
+            parameters['R'] = R
+            model = evaluate(dataset_name, parameters)
             logging.info("one loop cost %f:" %((end - start)/60))
             logging.debug("TPR %f:" %(model['precision']))
             logging.debug("FPR %f:" %(model['FPR']))
@@ -67,7 +68,7 @@ def eval_R(dataset_name):
 
     if not os.path.exists(os.path.dirname(TPR_file_path)):
         os.makedirs(os.path.dirname(TPR_file_path))
-        
+
     with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
         FD.write(json.dumps(TPRS_mean))
         logging.info("write to file %s:" %(TPR_file_path))
