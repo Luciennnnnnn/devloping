@@ -28,7 +28,7 @@ if not os.path.exists(log_dir):
 logging.basicConfig(filename='logs/' + time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) + '.log', filemode="w", 
         format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 
-def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
+def VITAD(Y, outliers_p, O, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'):
     R = maxRank
     dimY = Y.shape
     N = Y.ndim
@@ -43,6 +43,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
     Z0 = [] # A^n的先验的期望
     ZSigma0 = [] # A^n的先验的方差
+    X_C = np.zeros_like(Y)
 
     for n in range(N-1):
         if init == 'rand':
@@ -93,14 +94,14 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
     FPRS = []
     count = 0
     false_locations = []
-    nObs = np.prod(dimY[0:2])
     O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
         if t % 400 == 0:
             logging.debug(t)
         #  Model learning
         LB = []
-
+        
+        nObs = np.sum(O[:, :, t], (0,1))
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
 
         C = np.expand_dims(Y[:, :, t], 2)
@@ -240,6 +241,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
         count += TPR
         #X = np.expand_dims(X, 2)
         #RSE.append(norm(C-X-E) / norm(C))
+        X_C[:, :, t] = X
         TPRS.append(TPR)
         FPRS.append(FPR)
         Z0 = copy.deepcopy(Z)
@@ -255,7 +257,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
     model = {}
     # Output
-    #model['X'] = X
+    model['X'] = X_C
     #model['RSE'] = RSE
     model['TPRS'] = TPRS
     model['FPRS'] = FPRS
