@@ -13,6 +13,7 @@ def evaluate(dataset_name, parameters):
     K = parameters['K']
     theta = parameters['theta']
     Y = Y[:, :, 0:ed]
+    outlier = outlier[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
     omega = omega[:, :, 0:ed]
     model = VITAD(Y=Y + outliers_p * outlier, outliers_p=outliers_p, O=omega, maxRank=R, K=K, maxiters=20, tol=1e-4, verbose=True, init=inits[dataset_name])
