@@ -16,6 +16,7 @@ def evaluate(dataset_name, parameters):
     outlier = outlier[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
     Omega = Omega[:, :, 0:ed]
+    noises = noises[:, :, 0:ed]
     model = VITAD(Y=Y + outliers_p * outlier + noises, outliers_p=outliers_p, Omega=Omega, maxRank=R, K=K, maxiters=20, tol=1e-4, verbose=True, init=inits[dataset_name])
     model['ER'] = np.sum(np.square(model['X'] - Y)) / np.sum(np.square(Y))
     model['SRR'] = np.sum(np.abs((model['X'] - Y) / Y) <= theta) / np.prod(Y.shape)
