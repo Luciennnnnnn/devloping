@@ -82,7 +82,7 @@ def generator(dataset_name, parameters):
     if parameters['noise_scheme'] == "Gaussian":
         print("noise_scheme Gaussian")
         gaussian_noise = np.random.normal(0, 0.01, (DIM[0], DIM[1], DIM[2])) # 100%
-        a += gaussian_noise
+        noises += gaussian_noise
     elif parameters['noise_scheme'] == "outlier":
         print("noise_scheme outlier")
         outlier_noise = np.random.uniform(-0.05, 0.05, (DIM[0], DIM[1], DIM[2]))
@@ -94,7 +94,7 @@ def generator(dataset_name, parameters):
             x %= (DIM[0] * DIM[1])
             i = x // DIM[1]
             j = x % DIM[1]
-            a[i, j, k] += outlier_noise[i, j, k]
+            noises[i, j, k] += outlier_noise[i, j, k]
     elif parameters['noise_scheme'] == "mixture":
         print("noise_scheme mixture")
         outlier_noise = np.random.uniform(-0.05, 0.05, (DIM[0], DIM[1], DIM[2])) # 10%
@@ -112,13 +112,13 @@ def generator(dataset_name, parameters):
             i = x // DIM[1]
             j = x % DIM[1]
             if id < int(len(locations)) * 0.1:
-                a[i, j, k] += outlier_noise[i, j, k]
+                noises[i, j, k] += outlier_noise[i, j, k]
             elif id < int(len(locations)) * 0.4:
-                a[i, j, k] += gaussian_noise_1[i, j, k]
+                noises[i, j, k] += gaussian_noise_1[i, j, k]
             elif id < int(len(locations)) * 0.6:
-                a[i, j, k] += gaussian_noise_2[i, j, k]
+                noises[i, j, k] += gaussian_noise_2[i, j, k]
             else:
-                a[i, j, k] += expoential_power_noise[i, j, k]
+                noises[i, j, k] += expoential_power_noise[i, j, k]
             
 
     # if SNR != None:
@@ -181,7 +181,7 @@ def generator(dataset_name, parameters):
     elif parameters['outliers_scheme'] == "levy_stable":
         outliers = levy_stable.rvs(sigma, mu, size=(DIM[0], DIM[1], DIM[2]))
 
-    return a, inject_outliers, b, omega
+    return a, inject_outliers, b, noises, omega
 
 
 def generator2(dataset_name, fraction, mu, sigma, SNR=None, distribution="Gaussian"):

@@ -186,7 +186,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                     # -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0)
 
             # E_q[lnq(A)]
-            temp4 = 0 
+            temp4 = 0
             for n in range(N-1):
                 for i in range(dimY[n]):
                     temp4 += 0.5 * safelog(det(ZSigma[n][:, :, i]))
@@ -260,6 +260,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
     # Output
     model['X'] = X_C
     model['X2'] = tl.cp_to_tensor((None, [Z[0], Z[1], Z_t]))
+    model['E'] = E
     logging.debug('final RSE1: %f' % (norm(Y-model['X']-E) / norm(Y)))
     logging.debug('final RSE2: %f' % (norm(Y-model['X2']-E) / norm(Y)))
     #model['RSE'] = RSE

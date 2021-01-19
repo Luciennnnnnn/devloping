@@ -7,7 +7,7 @@ inits = {'Abilene': 'rand', 'GEANT': 'rand', 'CERNET': 'ml', 'VData50': 'rand', 
 
 def evaluate(dataset_name, parameters):
     # Run BayesCP
-    Y, outliers, outliers_p, Omega = generator(dataset_name, parameters)
+    Y, outliers, outliers_p, noises, Omega = generator(dataset_name, parameters)
     ed = parameters['ed']
     R = parameters['R']
     theta = parameters['theta']
@@ -19,11 +19,17 @@ def evaluate(dataset_name, parameters):
     # print('Omega', np.sum(Omega != 1))
     # print('outlier', np.sum(outliers_p * outlier))
     # print('noises', np.sum(noises))
-    model = VITAD(Y=Y + outliers_p * outliers, outliers_p=outliers_p, Omega=Omega, maxRank=R, maxiters=20, tol=1e-4, init=inits[dataset_name])
+    model = VITAD(Y=Y + outliers_p * outliers + noises, outliers_p=outliers_p, Omega=Omega, maxRank=R, maxiters=20, tol=1e-4, init=inits[dataset_name])
     model['ER'] = np.sum(np.square(model['X'] - Y)) / np.sum(np.square(Y))
     model['SRR'] = np.sum(np.abs((model['X'] - Y) / Y) <= theta) / np.prod(Y.shape)
     logging.debug("ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
     logging.debug("SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
+    logging.debug("SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
+    
+    Y += noises
+    logging.debug("@ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
+    logging.debug("@SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
+    logging.debug("@SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
     return model
 
 

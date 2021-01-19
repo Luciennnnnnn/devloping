@@ -10,6 +10,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='T-online')
     parser.add_argument('--noise_scheme', type=str, default=None)
     parser.add_argument('--outliers_scheme', type=str, default='Gaussian')
+    parser.add_argument('--theta', type=float, default=0.1)
 
     args = parser.parse_args()
 
@@ -19,10 +20,10 @@ if __name__ == '__main__':
     mu = 0
     sigma = 0.1
     SNR = None
-    parameters = {"ed": ed, "R":R, "K":K, "mu":mu, "sigma":sigma, "missing_ratio": 0
-                "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
+    parameters = {"ed": ed, "R":R, "mu":mu, "sigma":sigma, "theta": args.theta, "missing_ratio": 0,
+                "SNR": SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
-    logging.info('ed: %d, R: %d, K: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, K, mu, sigma, args.noise_scheme, args.outliers_scheme))     
+    logging.info('ed: %d, R: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, mu, sigma, args.noise_scheme, args.outliers_scheme))     
     start = time.time()
     eval_ratio('Abilene', parameters)
     end = time.time()
