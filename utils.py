@@ -59,6 +59,7 @@ def generator(dataset_name, parameters):
     b = np.zeros_like(a, dtype=bool)
     omega = np.ones_like(a)
     DIM = a.shape
+    
     locations = list(range(np.prod(DIM)))
 
     sigma = parameters['sigma']
