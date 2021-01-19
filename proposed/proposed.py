@@ -161,7 +161,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
                              np.reshape(ZSigma_t[:, :, t], [R*R, 1], 'F')).T
 
             # Update latent tensor X
-            X = np.squeeze(tl.cp_to_tensor((None, [Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)])))   #
+            X = np.squeeze(tl.kruskal_tensor.kruskal_to_tensor([Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)]))   #
 
             #  The most time and space consuming part
             EX2 = np.dot(np.dot(tensor_to_vec(O).T, khatri_rao([EZZT[0], EZZT[1],
@@ -180,19 +180,9 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             tau = a_tauN / b_tauN # posterior mean of tau 
 
             # Update sparse matrix E
-            sigma_E[:, :, t] = tau + 1
-            E[:, :, t] = np.reciprocal(sigma_E[:, :, t]) * (np.dot(phi, m_k) + tau * np.squeeze(C-np.expand_dims(X, axis=2)))
+            sigma_E[:, :, t] = tau + sigma_E0[:, :, t]
+            E[:, :, t] = np.reciprocal(sigma_E[:, :, t]) * (tau * np.squeeze(C-np.expand_dims(X, axis=2)) + sigma_E0[:, :, t]*E0[:, :, t])
 
-            # Update mean of Gaussian component
-            s_k2 = np.reciprocal(zeta + np.sum(phi, (0, 1)))
-            m_k = s_k2 * np.sum(phi * np.expand_dims(E[:, :, t], 2).repeat(K, 2), (0, 1))
-
-            # update Gaussian assign
-            #print(np.expand_dims(m_k, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1).shape)
-            #print(np.expand_dims(np.square(m_k) + s_k2, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1).shape)
-            phi = np.expand_dims(m_k, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1) \
-                * np.expand_dims(E[:, :, t], 2).repeat(K, 2) \
-                - 0.5 * np.expand_dims(np.square(m_k) + s_k2, (0,1)).repeat(dimY[0], axis=0).repeat(dimY[1], axis=1)
             # calculate lowerbound
 
             # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
@@ -216,7 +206,7 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
                     # -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0_t[:, :, t]))
 
             # E_q[lnp(\tau)]
-            temp3 = (a_tau0 - 1) * (digamma(a_tauN) - safelog(b_tauN)) - b_tau0 * (a_tauN / b_tauN)
+            temp3 = (a_tau0 - 1) * (digamma(a_tauN) - safelog(b_tauN)) - b_tau0 * tau
                     # -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0)
 
             # E_q[lnq(A)]
@@ -232,47 +222,39 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
             # -E_q[lnq(\tau)]
             temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN
 
-            #E_q[lnp(\mathcal{E} | \mathcal{C}, \mu)]
-            temp6 = - 0.5 * np.sum(np.square(E[:, :, t]) + sigma_E[:, :, t])\
-                + np.sum(E[:, :, t] * np.dot(phi, m_k))\
-                - 0.5 * np.sum(np.dot(phi, np.square(m_k) + s_k2))
-                  # -0.5 * nObs * safelog(2 * pi)
+            #E_q[lnp(\mathcal{E})]
+            temp6 = -0.5 * np.sum(sigma_E0[:, :, t] * (np.square(E[:, :, t]) + np.reciprocal(sigma_E[:, :, t])
+                                - 2*E[:, :, t]*E0[:, :, t])) 
+                  # -0.5 * nObs * safelog(2 * pi) + 0.5 * np.sum(safelog(sigma_E0))
+                  # -0.5 * sigma_E0[:, :, t] * np.square(E0[:, :, t])
 
             # -E_q[lnq(\mathcal{E})]
-            temp7 = - 0.5 * np.sum(safelog(sigma_E))
+            temp7 = - 0.5 * np.sum(safelog(sigma_E[:, :, t]))
                     # + 0.5 * (nObs * safelog(2 * pi) + nObs)
 
-            # E_q[lnp(\mu)]
-            temp8 = -0.5 * zeta * np.sum(np.square(m_k) + s_k2)
-                #-0.5 * K * safelog(2 * pi) + 0.5 * K * safelog(zeta)
+            # temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) \
+            #     - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] \
+            #         + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
 
-            # E_q[lnq(\mu)]
-            temp9 = 0.5 * np.sum(safelog(s_k2))
-                #+ 0.5 * K * (1 + safelog(2 * pi))
+            # temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) \
+            #     + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] \
+            #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
 
-            # E_q[lnp(\mathcal{C})]
-            temp10 = 0
-                #- nObs * safelog(K)
-
-            # E_q[lnq(\mathcal{C})]
-            temp11 = -np.sum(phi * safelog(phi))
-
-            LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7 + temp8 + temp9 + temp10 + temp11)
+            LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
             # Display progress
             if it > 2:
                 LBRelChan = abs(LB[it] - 2*LB[it-1] + LB[it-2])/-LB[1]
             else:
                 LBRelChan = 0
-            #print('Iter. %d: RelChan = %g' % (it, LBRelChan))
-            if t % 400 == 0:
-                logging.debug('Iter. %d: RelChan = %g' % (it, LBRelChan))
-            
+            #
+            if verbose:
+                print('Iter. %d: RelChan = %g' % (it, LBRelChan))
+                
             # Convergence check
             if it > 5 and (abs(LBRelChan) < tol):
-                # print('======= Converged===========')
-                if t % 400 == 0:
-                    logging.debug('======= Converged (%d, %d)===========' % (t, it))
+                if verbose:
+                    print('======= Converged===========')
                 break
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
@@ -284,6 +266,8 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
         FPRS.append(FPR)
         Z0 = copy.deepcopy(Z)
         ZSigma0 = copy.deepcopy(ZSigma)
+        E0 = copy.deepcopy(E)
+        sigma_E0 = copy.deepcopy(sigma_E0)
         a_tau0 = a_tauN
         b_tau0 = b_tauN
 
@@ -293,10 +277,12 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
     model = {}
     # Output
+    #model['X'] = X
     #model['RSE'] = RSE
     model['TPRS'] = TPRS
     model['FPRS'] = FPRS
     model['precision'] = count / T
     model['FPR'] = np.sum(FPRS) / T
+    #model['ZSigma'] = ZSigma
     #model['false_locations'] = false_locations
     return model
