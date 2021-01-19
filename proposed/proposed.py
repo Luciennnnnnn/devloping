@@ -267,8 +267,8 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
         FPRS.append(FPR)
         Z0 = copy.deepcopy(Z)
         ZSigma0 = copy.deepcopy(ZSigma)
-        E0 = copy.deepcopy(E)
-        sigma_E0 = copy.deepcopy(sigma_E0)
+        # E0 = copy.deepcopy(E)
+        # sigma_E0 = copy.deepcopy(sigma_E0)
         a_tau0 = a_tauN
         b_tau0 = b_tauN
 
