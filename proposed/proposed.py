@@ -87,12 +87,6 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
 
     sigma_E = np.ones_like(sigma_E0) # \overline{\zeta}, posterior precision of \mathcal{E}
     E = np.zeros_like(E0) # \overline{\mathcal{E}}, posterior mean of \mathcal{E}
-
-    #mu = np.ones([K, 1]) # mean of gaussian component
-    zeta = 1e-6 # prior precision of mean of gaussian component
-    m_k = np.zeros(K) # posterior mean of mean of gaussian component
-    s_k2 = np.ones(K) # posterior variance of mean of gaussian component
-    #Cat = np.ones([dimY[0], dimY[1], K]) # indicator vector
     
     RSE = []
     TPRS = []
@@ -108,7 +102,6 @@ def VITAD(Y, outliers_p, maxRank, K, maxiters, tol=1e-5, verbose=True, init='ml'
         LB = []
 
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
-        phi = np.ones([dimY[0], dimY[1], K]) / K # posterior probability distribution of C
 
         C = np.expand_dims(Y[:, :, t], 2)
         a_tauN = 1e-6
