@@ -159,7 +159,7 @@ def eval_missing_ratio(dataset_name, parameters):
     TPRS = []
     FPRS = []
     ERS = []
-    SSRS = []
+    SRRS = []
     for fraction in range(0, 10):
         parameters['missing_ratio'] = fraction / 10
         start = time.time()
@@ -170,35 +170,35 @@ def eval_missing_ratio(dataset_name, parameters):
         logging.debug("TPR %f:" %(model['precision']))
         logging.debug("FPR %f:" %(model['FPR']))
         logging.debug("ER %f:" %(model['ER']))
-        logging.debug("SSR %f:" %(model['SSR']))
+        logging.debug("SRR %f:" %(model['SRR']))
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
         ERS.append(model['ER'])
-        SSRS.append(model['SSR'])
+        SRRS.append(model['SRR'])
         #if fraction == 10:
         #    with open(os.path.join(os.path.join('../../results', dataset_name), 'proposed/false_locations.json'), 'w') as FD:
         #        FD.write(json.dumps(model['false_locations']))
     TPR_file_path = 'proposed/missing_ratio'
     FPR_file_path = 'proposed/missing_ratio'
     ER_file_path = 'proposed/missing_ratio'
-    SSR_file_path = 'proposed/missing_ratio'
+    SRR_file_path = 'proposed/missing_ratio'
     if parameters['noise_scheme'] != None:
         TPR_file_path += '_' + parameters['noise_scheme']
         FPR_file_path += '_' + parameters['noise_scheme']
         ER_file_path += '_' + parameters['noise_scheme']
-        SSR_file_path += '_' + parameters['noise_scheme']
+        SRR_file_path += '_' + parameters['noise_scheme']
 
 
     if parameters['outliers_scheme'] != None:
         TPR_file_path += '_' + parameters['outliers_scheme']
         FPR_file_path += '_' + parameters['outliers_scheme']
         ER_file_path += '_' + parameters['outliers_scheme']
-        SSR_file_path += '_' + parameters['outliers_scheme']
+        SRR_file_path += '_' + parameters['outliers_scheme']
 
     TPR_file_path += '_TPRS.json'
     FPR_file_path += '_FPRS.json'
     ER_file_path += '_ERS.json'
-    SSR_file_path += '_SSRS.json'
+    SRR_file_path += '_SRRS.json'
 
     if not os.path.exists(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path))):
         os.makedirs(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path)))
@@ -212,9 +212,9 @@ def eval_missing_ratio(dataset_name, parameters):
     with open(os.path.join(os.path.join('../../results', dataset_name), ER_file_path), 'w') as FD:
         logging.info("write to file %s:" %(ER_file_path))
         FD.write(json.dumps(ERS))
-    with open(os.path.join(os.path.join('../../results', dataset_name), SSR_file_path), 'w') as FD:
-        logging.info("write to file %s:" %(SSR_file_path))
-        FD.write(json.dumps(SSRS))
+    with open(os.path.join(os.path.join('../../results', dataset_name), SRR_file_path), 'w') as FD:
+        logging.info("write to file %s:" %(SRR_file_path))
+        FD.write(json.dumps(SRRS))
 
 def eval_ratio2(dataset_name):
     TPRS = []
