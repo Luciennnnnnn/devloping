@@ -101,7 +101,7 @@ def VITAD(Y, outliers_p, O, maxRank, K, maxiters, tol=1e-5, verbose=True, init='
         #  Model learning
         LB = []
         
-        nObs = np.sum(O[:, :, t], (0,1))
+        nObs = np.sum(O[:, :, t])
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
 
         C = np.expand_dims(Y[:, :, t], 2)
