@@ -40,7 +40,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
 
     tau = 1e4  # E[tau]
     dscale = 1
-
+    X_C = np.zeros_like(Y)
     Z0 = [] # A^n的先验的期望
     ZSigma0 = [] # A^n的先验的方差
 
@@ -239,11 +239,12 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
         count += TPR
         #X = np.expand_dims(X, 2)
         if t % 400 == 0:
-                logging.debug('t: %d, RSE: %f' % (t, norm(np.squeeze(C)-X-E[:, :, t]) / norm(C)))
+            logging.debug('t: %d, RSE: %f' % (t, norm(np.squeeze(C)-X-E[:, :, t]) / norm(C)))
         TPRS.append(TPR)
         FPRS.append(FPR)
         Z0 = copy.deepcopy(Z)
         ZSigma0 = copy.deepcopy(ZSigma)
+        X_C[:, :, t] = X
         # E0 = copy.deepcopy(E)
         # sigma_E0 = copy.deepcopy(sigma_E0)
         a_tau0 = a_tauN
@@ -254,8 +255,10 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
 
     model = {}
     # Output
-    model['X'] = tl.cp_to_tensor((None, [Z[0], Z[1], Z_t]))
-    logging.debug('final RSE: %f' % (norm(Y-model['X']-E) / norm(Y)))
+    model['X'] = X_C
+    model['X2'] = tl.cp_to_tensor((None, [Z[0], Z[1], Z_t]))
+    logging.debug('final RSE1: %f' % (norm(Y-model['X']-E) / norm(Y)))
+    logging.debug('final RSE2: %f' % (norm(Y-model['X2']-E) / norm(Y)))
     #model['RSE'] = RSE
     model['TPRS'] = TPRS
     model['FPRS'] = FPRS
