@@ -14,6 +14,7 @@ def evaluate(dataset_name, parameters):
     Y = Y[:, :, 0:ed]
     outliers = outliers[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
+    noises = noises[:, :, 0:ed]
     Omega = Omega[:, :, 0:ed]
     #noises = noises[:, :, 0:ed]
     # print('Omega', np.sum(Omega != 1))
