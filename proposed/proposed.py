@@ -239,7 +239,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
         count += TPR
         #X = np.expand_dims(X, 2)
         if t % 400 == 0:
-                logging.debug('t: %d, RSE: %f' % (t, norm(C-X-E) / norm(C)))
+                logging.debug('t: %d, RSE: %f' % (t, norm(np.squeeze(C)-X-E[:, :, t]) / norm(C)))
         TPRS.append(TPR)
         FPRS.append(FPR)
         Z0 = copy.deepcopy(Z)
@@ -255,7 +255,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
     model = {}
     # Output
     model['X'] = tl.cp_to_tensor((None, [Z[0], Z[1], Z_t]))
-    logging.debug('final RSE: %f' % (norm(C-model['X']-E) / norm(C)))
+    logging.debug('final RSE: %f' % (norm(Y-model['X']-E) / norm(Y)))
     #model['RSE'] = RSE
     model['TPRS'] = TPRS
     model['FPRS'] = FPRS
