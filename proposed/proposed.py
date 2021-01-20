@@ -225,7 +225,8 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                 LBRelChan = 0
             #
             if t % 400 == 0:
-                logging.debug('Iter. %d: RelChan = %g' % (it, LBRelChan))
+                logging.debug('Iter. %d: RelChan = %g LB = %g' % (it, LBRelChan, LB[it]))
+                
             
             # Convergence check
             if it > 5 and (abs(LBRelChan) < tol):
