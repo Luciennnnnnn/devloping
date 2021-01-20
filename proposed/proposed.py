@@ -91,16 +91,23 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
     RSE = []
     TPRS = []
     FPRS = []
+    nObs = np.prod(dimY[0:2])
     count = 0
     false_locations = []
+    O = np.ones([dimY[0], dimY[1], 1])
     for t in range(T):
         if t % 400 == 0:
             logging.debug(t)
         #  Model learning
         LB = []
-        O = np.expand_dims(Omega[:, :, t], axis=2)
-        nObs = np.sum(O)
         EZZT_t = np.reshape(ZSigma0_t[:, :, t], [R * R, 1], 'F').T
+
+        #sigma_E0 = np.ones([dimY[0], dimY[1], 1])
+        #E0 = np.zeros([dimY[0], dimY[1], 1])
+        #E0 = np.random.randn(dimY[0], dimY[1], 1)
+
+        #E = np.zeros_like(E0)
+        #sigma_E = np.ones_like(sigma_E0)
 
         C = np.expand_dims(Y[:, :, t], 2)
         a_tauN = 1e-6
@@ -128,6 +135,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             FslashY = np.dot(khatri_rao([Z[0], Z[1], Z_t[t, :]], skip_matrix=2, reverse=bool).T,
                              unfold((C-E[:, :, t]) * O, 2).T)
 
+            # parameter in current sample point
             ZSigma_t[:, :, t] = inv(tau * ENZZT[:, :, 0] + inv(ZSigma0_t[:, :, t]))
 
             Z_t[t, :] = (np.dot(ZSigma_t[:, :, t], (inv(ZSigma0_t[:, :, t]).dot(np.reshape(Z0_t[t, :], [R, 1])) +
@@ -137,85 +145,56 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                              np.reshape(ZSigma_t[:, :, t], [R*R, 1], 'F')).T
 
             # Update latent tensor X
-            X = np.squeeze(tl.cp_to_tensor((None, [Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)])))   #
+            X = np.squeeze(tl.kruskal_tensor.kruskal_to_tensor([Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)]))   #
 
             #  The most time and space consuming part
             EX2 = np.dot(np.dot(tensor_to_vec(O).T, khatri_rao([EZZT[0], EZZT[1],
                                 EZZT_t], reverse=bool)), np.ones([R * R, 1]))
 
-            EE2 = np.sum(np.square(E[:, :, t]) + np.reciprocal(sigma_E[:, :, t]))
-            err = np.dot(tensor_to_vec(C).T, tensor_to_vec(C)) \
-                    - 2 * tensor_to_vec(C).T.dot(tensor_to_vec(X)) \
-                    - 2*np.dot(tensor_to_vec(C).T, tensor_to_vec(E[:, :, t])) \
-                    + 2*np.dot(tensor_to_vec(X).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
+            EE2 = np.sum(np.square(E[:, :, t]) + sigma_E[:, :, t])
+            err = np.dot(tensor_to_vec(C).T, tensor_to_vec(C)) - 2 * tensor_to_vec(C).T \
+                .dot(tensor_to_vec(X)) -2*np.dot(tensor_to_vec(C).T, tensor_to_vec(E[:, :, t])) + \
+                  2*np.dot(tensor_to_vec(X).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
 
-            # update noise tau
+            #  update noise tau
             a_tauN = (a_tau0 + 0.5 * nObs)  # a_MnObs
             b_tauN = (b_tau0 + 0.5 * err)  # b_M
 
-            tau = a_tauN / b_tauN # posterior mean of tau 
+            tau = a_tauN / b_tauN
 
-            # Update sparse matrix E
-            sigma_E[:, :, t] = tau + sigma_E0[:, :, t]
-            E[:, :, t] = np.reciprocal(sigma_E[:, :, t]) * (tau * np.squeeze(C-np.expand_dims(X, axis=2)) + sigma_E0[:, :, t]*E0[:, :, t])
+            #Update sparse matrix E
+            sigma_E[:, :, t] = np.reciprocal(tau + np.reciprocal(sigma_E0[:, :, t]))
+            E[:, :, t] = (sigma_E[:, :, t] * (E0[:, :, t]/sigma_E0[:, :, t] + tau * np.squeeze(C-np.expand_dims(X, axis=2))))
 
-            # calculate lowerbound
-
-            # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
-            temp1 = 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) - 0.5 * tau * err 
-                    # - 0.5 * nObs * safelog(2 * pi)
-
-            # E_q[lnp(A)]
-            temp2 = 0 
+            temp1 = -0.5 * nObs * safelog(2 * pi) + 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) \
+                    - 0.5 * tau * err
+            temp2 = 0
             for n in range(N-1):
                 for i in range(dimY[n]):
-                  temp2 += - 0.5 * np.trace(inv(ZSigma0[n][:, :, i]).dot(ZSigma[n][:, :, i])) \
-                        - 0.5 * np.dot(np.expand_dims(Z[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z[n][i, :], 1)) \
-                        + np.dot(np.expand_dims(Z[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0[n][i, :], 1))
-                        # -0.5 * np.dot(np.expand_dims(Z0[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0[n][i, :], 1)) const
-                        # -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0[n][:, :, i])) const
+                  temp2 += -0.5 * R * safelog(2 * pi) + 0.5 * safelog(det(ZSigma0[n][:, :, i])) - 0.5 * \
+                           np.trace(ZSigma0[n][:, :, i].dot(ZSigma[n][:, :, i])) - 0.5 * \
+                           np.dot(np.expand_dims(Z[n][i, :], 0), ZSigma0[n][:, :, i]).dot(np.expand_dims(Z[n][i, :], 1))
 
-            temp2 += - 0.5 * np.trace(inv(ZSigma0_t[:, :, t]).dot(ZSigma_t[:, :, t])) \
-                    - 0.5 * np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), inv(ZSigma0_t[:, :, t])).dot(np.reshape(Z_t[t, :], [R, 1]))) \
-                    + np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), inv(ZSigma0_t[:, :, t])).dot(np.reshape(Z0_t[t, :], [R, 1])))
-                    # -0.5 * np.dot(np.expand_dims(Z0_t[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0_t[n][i, :], 1)) const no infuluence for convergence check.
-                    # -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0_t[:, :, t]))
+            temp2 += -0.5 * R * safelog(2 * pi) + 0.5 * safelog(det(ZSigma0_t[:, :, t])) - 0.5 * \
+                           np.trace(ZSigma0_t[:, :, t].dot(ZSigma_t[:, :, t])) - 0.5 * \
+                           np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), ZSigma0_t[:, :, t]).dot(np.reshape(Z_t[t, :], [R, 1])))
 
-            # E_q[lnp(\tau)]
-            temp3 = (a_tau0 - 1) * (digamma(a_tauN) - safelog(b_tauN)) - b_tau0 * tau
-                    # -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0)
+            temp3 = -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0) + (a_tau0 - 1) * (
+                        digamma(a_tauN) - safelog(b_tauN)) \
+                    - b_tau0 * (a_tauN / b_tauN)
 
-            # E_q[lnq(A)]
             temp4 = 0
             for n in range(N-1):
-                for i in range(dimY[n]):
-                    temp4 += 0.5 * safelog(det(ZSigma[n][:, :, i]))
-                        #+ 0.5 * R * (1 + safelog(2 * pi))
+                for i in range(ZSigma[n].shape[2]):
+                    temp4 += 0.5 * safelog(np.linalg.det(ZSigma[n][:, :, i])) + 0.5 * R * (1 + safelog(2 * pi))
 
-            temp4 += 0.5 * safelog(det(ZSigma_t[:, :, t]))
-                    #+ 0.5 * R * (1 + safelog(2 * pi))
+            temp4 += 0.5 * safelog(np.linalg.det(ZSigma_t[:, :, t])) + 0.5 * R * (1 + safelog(2 * pi))
 
-            # -E_q[lnq(\tau)]
             temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN
 
-            #E_q[lnp(\mathcal{E})]
-            temp6 = -0.5 * np.sum(sigma_E0[:, :, t] * (np.square(E[:, :, t]) + np.reciprocal(sigma_E[:, :, t])
-                                - 2*E[:, :, t]*E0[:, :, t])) 
-                  # -0.5 * nObs * safelog(2 * pi) + 0.5 * np.sum(safelog(sigma_E0))
-                  # -0.5 * sigma_E0[:, :, t] * np.square(E0[:, :, t])
+            temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
 
-            # -E_q[lnq(\mathcal{E})]
-            temp7 = - 0.5 * np.sum(safelog(sigma_E[:, :, t]))
-                    # + 0.5 * (nObs * safelog(2 * pi) + nObs)
-
-            # temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) \
-            #     - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] \
-            #         + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
-
-            # temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) \
-            #     + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] \
-            #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
-
+            temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] + np.square(E[:, :, t]))/sigma_E[:, :, t])
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
             # Display progress
