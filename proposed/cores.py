@@ -46,10 +46,12 @@ def eval_time(dataset_name, ed):
 
 
 def eval_R(dataset_name, parameters):
-    TPRS = [[] for _ in range(2, 51, 2)]
-    FPRS = [[] for _ in range(2, 51, 2)]
-    for i in range(1):
-        for R in range(2, 15, 2):
+    nums = 1
+    up = 15
+    TPRS = [[] for _ in range(2, up, 2)]
+    FPRS = [[] for _ in range(2, up, 2)]
+    for i in range(nums):
+        for R in range(2, up, 2):
             parameters['R'] = R
             start = time.time()
             model = evaluate(dataset_name, parameters)
@@ -58,19 +60,21 @@ def eval_R(dataset_name, parameters):
             logging.info("one loop cost %f:" %((end - start)/60))
             logging.debug("Rank: %d, TPR %f:" %(parameters['R'], model['precision']))
             logging.debug("Rank: %d, FPR %f:" %(parameters['R'], model['FPR']))
+            logging.debug("Rank: %d, ER %f:" %(parameters['R'], model['ER']))
+            logging.debug("Rank: %d, SRR %f:" %(parameters['R'], model['SRR']))
             TPRS[i].append(model['precision'])
             FPRS[i].append(model['FPR'])
 
     TPRS_mean = []
     FPRS_mean = []
-    for i in range(len(range(2, 51, 2))):
+    for i in range(len(range(2, up, 2))):
         sum = 0
         sum2 = 0
-        for j in range(10):
+        for j in range(nums):
             sum += TPRS[j][i]
             sum2 += FPRS[j][i]
-        TPRS_mean.append(sum / 10)
-        FPRS_mean.append(sum2 / 10)
+        TPRS_mean.append(sum / nums)
+        FPRS_mean.append(sum2 / nums)
 
     TPR_file_path = 'proposed/R'
     FPR_file_path = 'proposed/R'

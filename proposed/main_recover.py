@@ -14,7 +14,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ed = 8000
-    R = 2
+    R = 8
     K = 6
     mu = 0
     sigma = 0.1
