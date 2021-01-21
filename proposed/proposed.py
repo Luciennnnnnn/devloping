@@ -117,16 +117,16 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                                  unfold((C-np.expand_dims(E[:, :, t], axis=2)) * O, n).T)
 
                 for i in range(dimY[n]):
-                    logging.debug('n:%d, i:%d Z'%(n, i))
-                    logging.debug('before ZSigma:' + str(ZSigma[n][:, :, i]))
+                    #logging.debug('n:%d, i:%d Z'%(n, i))
+                    #logging.debug('before ZSigma:' + str(ZSigma[n][:, :, i]))
                     ZSigma[n][:, :, i] = inv(tau * ENZZT[:, :, i] + inv(ZSigma0[n][:, :, i]))
-                    logging.debug('after ZSigma:' + str(ZSigma[n][:, :, i]))
+                    #logging.debug('after ZSigma:' + str(ZSigma[n][:, :, i]))
 
-                    logging.debug('before Z:' + str(Z[n][i, :]))
+                    #logging.debug('before Z:' + str(Z[n][i, :]))
                     Z[n][i, :] = np.squeeze((np.dot(ZSigma[n][:, :, i], (inv(ZSigma0[n][:, :, i]).dot(np.expand_dims(Z0[n][i, :], 1))
                                                     + tau*np.expand_dims(FslashY[:, i], 1)))).T)
                                                     
-                    logging.debug('after Z:' + str(Z[n][i, :]))
+                    #logging.debug('after Z:' + str(Z[n][i, :]))
 
                 EZZT[n] = (np.reshape(ZSigma[n], [R * R, dimY[n]], 'F') + khatri_rao([Z[n].T, Z[n].T])).T
 
@@ -226,28 +226,6 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
 
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
-            logging.debug('t %d, Iter. %d' %(t, it))
-            
-            logging.debug('Z0[0]:' + str(Z0[0]))
-            logging.debug('Z0[1]:' + str(Z0[1]))
-            logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
-            logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
-            logging.debug('Z[0]:' + str(Z[0]))
-            logging.debug('Z[1]:' + str(Z[1]))
-            logging.debug('ZSigma[0]:' + str(ZSigma[0]))
-            logging.debug('ZSigma[1]:' + str(ZSigma[1]))
-
-
-            logging.debug('a_tau0: %f' %(a_tau0))
-            logging.debug('b_tau0: %f' %(b_tau0))
-            logging.debug('a_tauN: %f' %(a_tauN))
-            logging.debug('b_tauN: %f' %(b_tauN))
-            
-            logging.debug('E0:' + str(E0[:, :, t]))
-            logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
-            logging.debug('E:' + str(E[:, :, t]))
-            logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
-
             # Display progress
             if it > 2:
                 LBRelChan = abs(LB[it] - 2*LB[it-1] + LB[it-2])/-LB[1]
@@ -264,6 +242,28 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                 if t % 400 == 0:
                     logging.debug('======= Converged (%d, %d)===========' % (t, it))
                 break
+        
+        logging.debug('t %d, Iter. %d' %(t, it))
+        
+        logging.debug('Z0[0]:' + str(Z0[0]))
+        logging.debug('Z0[1]:' + str(Z0[1]))
+        logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
+        logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
+        logging.debug('Z[0]:' + str(Z[0]))
+        logging.debug('Z[1]:' + str(Z[1]))
+        logging.debug('ZSigma[0]:' + str(ZSigma[0]))
+        logging.debug('ZSigma[1]:' + str(ZSigma[1]))
+
+
+        logging.debug('a_tau0: %f' %(a_tau0))
+        logging.debug('b_tau0: %f' %(b_tau0))
+        logging.debug('a_tauN: %f' %(a_tauN))
+        logging.debug('b_tauN: %f' %(b_tauN))
+        
+        logging.debug('E0:' + str(E0[:, :, t]))
+        logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
+        logging.debug('E:' + str(E[:, :, t]))
+        logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
         #false_locations.append(locations)
