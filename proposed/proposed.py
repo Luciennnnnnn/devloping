@@ -230,10 +230,10 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             logging.debug('ZSigma[1]:' + str(ZSigma[1]))
 
 
-            logging.debug('a_tau0:' + a_tau0)
-            logging.debug('b_tau0:' + a_tau0)
-            logging.debug('a_tauN:' + a_tau0)
-            logging.debug('b_tauN:' + a_tau0)
+            logging.debug('a_tau0: %f' %(a_tau0))
+            logging.debug('b_tau0: %f' %(b_tau0))
+            logging.debug('a_tauN: %f' %(a_tauN))
+            logging.debug('b_tauN: %f' %(b_tauN))
             
             logging.debug('E0:' + str(E0[:, :, t]))
             logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
