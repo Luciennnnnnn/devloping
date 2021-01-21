@@ -68,7 +68,8 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
     # --------- E(aa^T) = cov(a,a) + E(a)E(a^T)----------------
     EZZT = []
     for n in range(N-1):
-        EZZT.append(np.reshape(ZSigma[n], [R*R, dimY[n]], 'F').T)#向量化的B^(n)
+        # EZZT.append(np.reshape(ZSigma[n], [R*R, dimY[n]], 'F').T)#向量化的B^(n)
+        EZZT.append((np.reshape(ZSigma[n], [R * R, dimY[n]], 'F') + khatri_rao([Z[n].T, Z[n].T])).T) # 向量化的B^(n)
     #         EZZT{n} = (reshape(ZSigma{n}, [R*R, dimY(n)]))' + khatrirao_fast(Z{n}',Z{n}')'\
 
     Z0_t = np.random.randn(T, R)
@@ -116,8 +117,11 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                                  unfold((C-np.expand_dims(E[:, :, t], axis=2)) * O, n).T)
 
                 for i in range(dimY[n]):
-                    ZSigma[n][:, :, i] = inv(tau * ENZZT[:, :, i] + inv(ZSigma0[n][:, :, i]))
                     logging.debug('n:%d, i:%d Z'%(n, i))
+                    logging.debug('before Z:' + str(ZSigma[n][:, :, i]))
+                    ZSigma[n][:, :, i] = inv(tau * ENZZT[:, :, i] + inv(ZSigma0[n][:, :, i]))
+                    logging.debug('after Z:' + str(ZSigma[n][:, :, i]))
+
                     logging.debug('before Z:' + str(Z[n][i, :]))
                     Z[n][i, :] = np.squeeze((np.dot(ZSigma[n][:, :, i], (inv(ZSigma0[n][:, :, i]).dot(np.expand_dims(Z0[n][i, :], 1))
                                                     + tau*np.expand_dims(FslashY[:, i], 1)))).T)
