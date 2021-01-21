@@ -151,11 +151,11 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             EX2 = np.dot(np.dot(tensor_to_vec(O).T, khatri_rao([EZZT[0], EZZT[1],
                                 EZZT_t], reverse=bool)), np.ones([R * R, 1]))
 
-            EE2 = np.sum(np.square(E[:, :, t]) + np.reciprocal(sigma_E[:, :, t]))
-            err = np.dot(tensor_to_vec(C).T, tensor_to_vec(C)) \
-                    - 2 * tensor_to_vec(C).T.dot(tensor_to_vec(X)) \
-                    - 2*np.dot(tensor_to_vec(C).T, tensor_to_vec(E[:, :, t])) \
-                    + 2*np.dot(tensor_to_vec(X).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
+            EE2 = np.sum(np.square(E[:, :, t]) * np.squeeze(O) + np.reciprocal(sigma_E[:, :, t]) * np.squeeze(O))
+            err = np.dot(tensor_to_vec(C*O).T, tensor_to_vec(C*O)) \
+                    - 2 * tensor_to_vec(C*O).T.dot(tensor_to_vec(X*O)) \
+                    - 2*np.dot(tensor_to_vec(C*O).T, tensor_to_vec(O)*tensor_to_vec(E[:, :, t])) \
+                    + 2*np.dot(tensor_to_vec(X*O).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
 
             # update noise tau
             a_tauN = (a_tau0 + 0.5 * nObs)  # a_MnObs
@@ -242,28 +242,28 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                 if t % 800 == 0:
                     logging.debug('======= Converged (%d, %d)===========' % (t, it))
                 break
-        if t % 800 == 0:
-            logging.debug('t %d, Iter. %d' %(t, it))
+        # if t % 800 == 0:
+        #     logging.debug('t %d, Iter. %d' %(t, it))
             
-            logging.debug('Z0[0]:' + str(Z0[0]))
-            logging.debug('Z0[1]:' + str(Z0[1]))
-            logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
-            logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
-            logging.debug('Z[0]:' + str(Z[0]))
-            logging.debug('Z[1]:' + str(Z[1]))
-            logging.debug('ZSigma[0]:' + str(ZSigma[0]))
-            logging.debug('ZSigma[1]:' + str(ZSigma[1]))
+        #     logging.debug('Z0[0]:' + str(Z0[0]))
+        #     logging.debug('Z0[1]:' + str(Z0[1]))
+        #     logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
+        #     logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
+        #     logging.debug('Z[0]:' + str(Z[0]))
+        #     logging.debug('Z[1]:' + str(Z[1]))
+        #     logging.debug('ZSigma[0]:' + str(ZSigma[0]))
+        #     logging.debug('ZSigma[1]:' + str(ZSigma[1]))
 
 
-            logging.debug('a_tau0: %f' %(a_tau0))
-            logging.debug('b_tau0: %f' %(b_tau0))
-            logging.debug('a_tauN: %f' %(a_tauN))
-            logging.debug('b_tauN: %f' %(b_tauN))
+        #     logging.debug('a_tau0: %f' %(a_tau0))
+        #     logging.debug('b_tau0: %f' %(b_tau0))
+        #     logging.debug('a_tauN: %f' %(a_tauN))
+        #     logging.debug('b_tauN: %f' %(b_tauN))
             
-            logging.debug('E0:' + str(E0[:, :, t]))
-            logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
-            logging.debug('E:' + str(E[:, :, t]))
-            logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
+        #     logging.debug('E0:' + str(E0[:, :, t]))
+        #     logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
+        #     logging.debug('E:' + str(E[:, :, t]))
+        #     logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
         #false_locations.append(locations)
