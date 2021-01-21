@@ -6,21 +6,20 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='T-online')
     parser.add_argument('--noise_scheme', type=str, default=None)
-    parser.add_argument('--outliers_scheme', type=str, default='Gaussian')
+    parser.add_argument('--outliers_scheme', type=str, default=None)
+    parser.add_argument('--fraction', type=float, default=0)
 
     args = parser.parse_args()
 
     ed = 8000
     R = 6
-    K = 6
     mu = 0
     sigma = 0.1
-    fraction = 0.1
     SNR = None
-    parameters = {"ed": ed, "R":R, "K":K, "mu":mu, "sigma":sigma, "fraction":fraction,
+    parameters = {"ed": ed, "R":R, "mu":mu, "sigma":sigma, "fraction":args.fraction,
                 "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
-    logging.info('ed: %d, R: %d, K: %d, mu: %d, sigma: %f, fraction: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, K, mu, sigma, fraction, args.noise_scheme, args.outliers_scheme))     
+    logging.info('ed: %d, R: %d, mu: %d, sigma: %f, fraction: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, mu, sigma, args.fraction, args.noise_scheme, args.outliers_scheme))     
     start = time.time()
     eval_R('Abilene', parameters)
     end = time.time()
