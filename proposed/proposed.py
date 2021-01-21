@@ -62,8 +62,8 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
     Z = [] # A^n的后验的期望
     ZSigma = [] # A^n的后验的方差
     for n in range(N - 1):
-        Z.append(Z0[n])  # E[A ^ (n)]
-        ZSigma.append(ZSigma0[n])
+        Z.append(Z0[n].copy())  # E[A ^ (n)]
+        ZSigma.append(ZSigma0[n].copy())
 
     # --------- E(aa^T) = cov(a,a) + E(a)E(a^T)----------------
     EZZT = []
