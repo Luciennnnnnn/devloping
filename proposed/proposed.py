@@ -118,9 +118,9 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
 
                 for i in range(dimY[n]):
                     logging.debug('n:%d, i:%d Z'%(n, i))
-                    logging.debug('before Z:' + str(ZSigma[n][:, :, i]))
+                    logging.debug('before ZSigma:' + str(ZSigma[n][:, :, i]))
                     ZSigma[n][:, :, i] = inv(tau * ENZZT[:, :, i] + inv(ZSigma0[n][:, :, i]))
-                    logging.debug('after Z:' + str(ZSigma[n][:, :, i]))
+                    logging.debug('after ZSigma:' + str(ZSigma[n][:, :, i]))
 
                     logging.debug('before Z:' + str(Z[n][i, :]))
                     Z[n][i, :] = np.squeeze((np.dot(ZSigma[n][:, :, i], (inv(ZSigma0[n][:, :, i]).dot(np.expand_dims(Z0[n][i, :], 1))
