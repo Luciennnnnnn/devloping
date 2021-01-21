@@ -17,7 +17,7 @@ if __name__ == '__main__':
     sigma = 0.1
     SNR = None
     parameters = {"ed": ed, "R":R, "mu":mu, "sigma":sigma, "fraction":args.fraction, "missing_ratio": 0,
-                "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
+                "theta": 0.1, "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
     logging.info('ed: %d, R: %d, mu: %d, sigma: %f, fraction: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, mu, sigma, args.fraction, args.noise_scheme, args.outliers_scheme))     
     start = time.time()
