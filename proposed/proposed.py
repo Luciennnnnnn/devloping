@@ -157,7 +157,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
 
             # Update sparse matrix E
             sigma_E[:, :, t] = tau + sigma_E0[:, :, t]
-            E[:, :, t] = np.reciprocal(sigma_E[:, :, t]) * (tau * np.squeeze(C-np.expand_dims(X, axis=2)) + sigma_E0[:, :, t]*E0[:, :, t])
+            E[:, :, t] = (tau * np.squeeze(C-np.expand_dims(X, axis=2)) + sigma_E0[:, :, t]*E0[:, :, t]) / sigma_E[:, :, t]
 
             # calculate lowerbound
 
@@ -217,6 +217,28 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
 
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
+
+            logging.debug('t %d, Iter. %d' %(t, it))
+            
+            logging.debug('Z0[0]:', Z0[0])
+            logging.debug('Z0[1]:', Z0[1])
+            logging.debug('ZSigma0[0]:', ZSigma0[0])
+            logging.debug('ZSigma0[1]:', ZSigma0[1])
+            logging.debug('Z[0]:', Z[0])
+            logging.debug('Z[1]:', Z[1])
+            logging.debug('ZSigma[0]:', ZSigma[0])
+            logging.debug('ZSigma[1]:', ZSigma[1])
+
+
+            logging.debug('a_tau0:', a_tau0)
+            logging.debug('b_tau0:', a_tau0)
+            logging.debug('a_tauN:', a_tau0)
+            logging.debug('b_tauN:', a_tau0)
+            
+            logging.debug('E:', E0[:, :, t])
+            logging.debug('sigma_E:', sigma_E0[:, :, t])
+            logging.debug('E:', E[:, :, t])
+            logging.debug('sigma_E:', sigma_E[:, :, t])
 
             # Display progress
             if it > 2:
