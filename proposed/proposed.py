@@ -152,7 +152,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                                 EZZT_t], reverse=bool)), np.ones([R * R, 1]))
 
             print(E[:, :, t].shape)
-            print(tensor_to_vec(E[:, :, t].shape)
+            print(tensor_to_vec(E[:, :, t]).shape)
             EE2 = np.sum(np.square(E[:, :, t]) * np.squeeze(O) + np.reciprocal(sigma_E[:, :, t]) * np.squeeze(O))
             err = np.dot(tensor_to_vec(C*O).T, tensor_to_vec(C*O)) \
                     - 2 * tensor_to_vec(C*O).T.dot(tensor_to_vec(X*O)) \
