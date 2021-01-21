@@ -220,25 +220,25 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
 
             logging.debug('t %d, Iter. %d' %(t, it))
             
-            logging.debug('Z0[0]:', Z0[0])
-            logging.debug('Z0[1]:', Z0[1])
-            logging.debug('ZSigma0[0]:', ZSigma0[0])
-            logging.debug('ZSigma0[1]:', ZSigma0[1])
-            logging.debug('Z[0]:', Z[0])
-            logging.debug('Z[1]:', Z[1])
-            logging.debug('ZSigma[0]:', ZSigma[0])
-            logging.debug('ZSigma[1]:', ZSigma[1])
+            logging.debug('Z0[0]:' + str(Z0[0]))
+            logging.debug('Z0[1]:' + str(Z0[1]))
+            logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
+            logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
+            logging.debug('Z[0]:' + str(Z[0]))
+            logging.debug('Z[1]:' + str(Z[1]))
+            logging.debug('ZSigma[0]:' + str(ZSigma[0]))
+            logging.debug('ZSigma[1]:' + str(ZSigma[1]))
 
 
-            logging.debug('a_tau0:', a_tau0)
-            logging.debug('b_tau0:', a_tau0)
-            logging.debug('a_tauN:', a_tau0)
-            logging.debug('b_tauN:', a_tau0)
+            logging.debug('a_tau0:' + a_tau0)
+            logging.debug('b_tau0:' + a_tau0)
+            logging.debug('a_tauN:' + a_tau0)
+            logging.debug('b_tauN:' + a_tau0)
             
-            logging.debug('E:', E0[:, :, t])
-            logging.debug('sigma_E:', sigma_E0[:, :, t])
-            logging.debug('E:', E[:, :, t])
-            logging.debug('sigma_E:', sigma_E[:, :, t])
+            logging.debug('E0:' + str(E0[:, :, t]))
+            logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
+            logging.debug('E:' + str(E[:, :, t]))
+            logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
 
             # Display progress
             if it > 2:
