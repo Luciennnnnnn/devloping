@@ -155,7 +155,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             err = np.dot(tensor_to_vec(C*O).T, tensor_to_vec(C*O)) \
                     - 2 * tensor_to_vec(C*O).T.dot(tensor_to_vec(X*O)) \
                     - 2*np.dot(tensor_to_vec(C*O).T, tensor_to_vec(O)*tensor_to_vec(E[:, :, t])) \
-                    + 2*np.dot(tensor_to_vec(X*O).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
+                    + 2*np.dot(tensor_to_vec(X*np.squeeze(O)).T, tensor_to_vec(E[:, :, t])) + EX2 + EE2
 
             # update noise tau
             a_tauN = (a_tau0 + 0.5 * nObs)  # a_MnObs
