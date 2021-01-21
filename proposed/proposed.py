@@ -95,7 +95,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
     count = 0
     false_locations = []
     for t in range(T):
-        if t % 400 == 0:
+        if t % 800 == 0:
             logging.debug(t)
         #  Model learning
         LB = []
@@ -232,47 +232,47 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             else:
                 LBRelChan = 0
             #
-            if t % 400 == 0:
+            if t % 800 == 0:
                 logging.debug('Iter. %d: RelChan = %g LB = %g' % (it, LBRelChan, LB[it]))
                 
             
             # Convergence check
             if it > 5 and (abs(LBRelChan) < tol):
                 # print('======= Converged===========')
-                if t % 400 == 0:
+                if t % 800 == 0:
                     logging.debug('======= Converged (%d, %d)===========' % (t, it))
                 break
-        
-        logging.debug('t %d, Iter. %d' %(t, it))
-        
-        logging.debug('Z0[0]:' + str(Z0[0]))
-        logging.debug('Z0[1]:' + str(Z0[1]))
-        logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
-        logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
-        logging.debug('Z[0]:' + str(Z[0]))
-        logging.debug('Z[1]:' + str(Z[1]))
-        logging.debug('ZSigma[0]:' + str(ZSigma[0]))
-        logging.debug('ZSigma[1]:' + str(ZSigma[1]))
+        if t % 800 == 0:
+            logging.debug('t %d, Iter. %d' %(t, it))
+            
+            logging.debug('Z0[0]:' + str(Z0[0]))
+            logging.debug('Z0[1]:' + str(Z0[1]))
+            logging.debug('ZSigma0[0]:' + str(ZSigma0[0]))
+            logging.debug('ZSigma0[1]:' + str(ZSigma0[1]))
+            logging.debug('Z[0]:' + str(Z[0]))
+            logging.debug('Z[1]:' + str(Z[1]))
+            logging.debug('ZSigma[0]:' + str(ZSigma[0]))
+            logging.debug('ZSigma[1]:' + str(ZSigma[1]))
 
 
-        logging.debug('a_tau0: %f' %(a_tau0))
-        logging.debug('b_tau0: %f' %(b_tau0))
-        logging.debug('a_tauN: %f' %(a_tauN))
-        logging.debug('b_tauN: %f' %(b_tauN))
-        
-        logging.debug('E0:' + str(E0[:, :, t]))
-        logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
-        logging.debug('E:' + str(E[:, :, t]))
-        logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
+            logging.debug('a_tau0: %f' %(a_tau0))
+            logging.debug('b_tau0: %f' %(b_tau0))
+            logging.debug('a_tauN: %f' %(a_tauN))
+            logging.debug('b_tauN: %f' %(b_tauN))
+            
+            logging.debug('E0:' + str(E0[:, :, t]))
+            logging.debug('sigma_E0:' + str(sigma_E0[:, :, t]))
+            logging.debug('E:' + str(E[:, :, t]))
+            logging.debug('sigma_E:' + str(sigma_E[:, :, t]))
 
         [TPR, FPR] = check(E[:, :, t], outliers_p[:, :, t], outliers_count[t], dimY)
         #false_locations.append(locations)
         count += TPR
         #X = np.expand_dims(X, 2)
-        if t % 400 == 0:
-            print(np.squeeze(C))
+        if t % 800 == 0:
+            logging.debug('np.squeeze(C):' + str(np.squeeze(C)))
             X = np.squeeze(tl.cp_to_tensor((None, [Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)])))
-            print(X)
+            logging.debug('X:' + str(X))
             logging.debug('t: %d, RSE: %f' % (t, norm(np.squeeze(C)-X-E[:, :, t]) / norm(C)))
         TPRS.append(TPR)
         FPRS.append(FPR)
