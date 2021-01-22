@@ -106,7 +106,7 @@ def update(t, M, X, S, epsilon, maxiters, A_old, B_old, C_old, T_A1_old, T_A2_ol
         S[s[0], s[1], t + T] = elem[0]
 
     for it in range(maxiters-1):
-        X[:, :, t + T] = tl.cp_to_tensor((None, [A, B, np.expand_dims(C[-1, :], axis=0)]))
+        X[:, :, t + T] = np.squeeze(tl.cp_to_tensor((None, [A, B, np.expand_dims(C[-1, :], axis=0)])))
         #print('pinv(khatri_rao([B_old, A_old]).T):', scipy.linalg.pinv(khatri_rao([B_old, A_old]).T))
         C[-1, :] = np.dot(unfold(np.expand_dims(X[:, :, t+T], axis=2), 2), scipy.linalg.pinv(np.nan_to_num(khatri_rao([B_old, A_old]).T)))
         T_A1 = T_A1_com + np.dot(unfold(X[:, :, t + T], 0),
