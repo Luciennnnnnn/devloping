@@ -17,7 +17,7 @@ if __name__ == '__main__':
     sigma = 0.1
     SNR = None
     init_scheme = 'svd'
-    parameters = {"ed": 8000, "R":6, "mu":0, "sigma":0.1, "SNR": SNR, "missing_ratio": 0,
+    parameters = {"ed": 8000, "R":6, "mu":0, "sigma":0.1, "theta": args.theta, "SNR": SNR, "missing_ratio": 0,
                 "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme, 'init': init_scheme}
     logging.info('T-online ratio---- dataset: %s, ed: %d, R: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s, init: %s'%(args.dataset, ed, R, mu, sigma, args.noise_scheme, args.outliers_scheme, init_scheme))
 

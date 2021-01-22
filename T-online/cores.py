@@ -9,6 +9,7 @@ def evaluate(dataset_name, parameters):
     # Run BayesCP
     ed = parameters['ed']
     R = parameters['R']
+    theta = parameters['theta']
     init = parameters['init']
     Y, outliers, outliers_p, noises, Omega = generator(dataset_name, parameters)
 
