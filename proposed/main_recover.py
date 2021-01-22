@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parameters = {"ed": ed, "R":R, "mu":mu, "sigma":sigma, "theta": args.theta, "fraction": 0, 
                 "SNR":SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
-    logging.info('recover --- ed: %d, R: %d, mu: %d, sigma: %f, theta: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, mu, sigma, args.theta, args.noise_scheme, args.outliers_scheme))     
+    logging.info('recover --- ed: %d, R: %d, mu: %d, sigma: %f, theta: %f, noise_scheme: %s, outliers_scheme: %s'%(ed, R, mu, sigma, args.theta, args.noise_scheme, args.outliers_scheme))
     start = time.time()
     eval_missing_ratio('Abilene', parameters)
     end = time.time()
