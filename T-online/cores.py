@@ -10,13 +10,13 @@ def evaluate(dataset_name, parameters):
     ed = parameters['ed']
     R = parameters['R']
     init = parameters['init']
-    Y, outlier, outliers_p, Omega = generator(dataset_name, parameters)
+    Y, outliers, outliers_p, noises, Omega = generator(dataset_name, parameters)
 
     if ed == None:
         ed = Y.shape[2]
     Y = Y[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
-    L, S = T_online(Y=Y, epsilon=np.sum(outliers_p, (0, 1)), R=R, W=Ws[dataset_name], maxiters=20, init=init)
+    L, S = T_online(Y=Y + outliers + noises, epsilon=np.sum(outliers_p, (0, 1)), R=R, W=Ws[dataset_name], maxiters=20, init=init)
     model = {}
     model['TPRS'] = []
     model['FPRS'] = []
@@ -31,6 +31,17 @@ def evaluate(dataset_name, parameters):
         model['FPR'] += FPR
     model['precision'] /= Y.shape[2]
     model['FPR'] /= Y.shape[2]
+
+    model['ER'] = np.sum(np.square(model['X'] - Y)) / np.sum(np.square(Y))
+    model['SRR'] = np.sum(np.abs((model['X'] - Y) / Y) <= theta) / np.prod(Y.shape)
+    logging.debug("ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
+    logging.debug("SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
+    logging.debug("SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
+    
+    Y += noises
+    logging.debug("@ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
+    logging.debug("@SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
+    logging.debug("@SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
     return model
 
 
@@ -108,9 +119,12 @@ def eval_ratio(dataset_name, parameters):
         start = time.time()
         model = evaluate(dataset_name, parameters)
         end = time.time()
+        logging.info("dataset: %s, fraction: %f" %(dataset_name, parameters['fraction']))
         logging.info("one loop cost %f:" %((end - start)/60))
         logging.debug("TPR %f:" %(model['precision']))
         logging.debug("FPR %f:" %(model['FPR']))
+        logging.debug("ER %f:" %(model['ER']))
+        logging.debug("SRR %f:" %(model['SRR']))
         TPRS.append(model['precision'])
         FPRS.append(model['FPR'])
 
