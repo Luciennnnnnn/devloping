@@ -23,7 +23,7 @@ if __name__ == '__main__':
     parameters = {"ed": ed, "R":R, "mu":mu, "sigma":sigma, "theta": args.theta, "missing_ratio": 0,
                 "SNR": SNR, "noise_scheme": args.noise_scheme, 'outliers_scheme': args.outliers_scheme}
     
-    logging.info('ratio ----- dataset: %s, ed: %d, R: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s'%(args.args.dataset, ed, R, mu, sigma, args.noise_scheme, args.outliers_scheme))     
+    logging.info('ratio ----- dataset: %s, ed: %d, R: %d, mu: %d, sigma: %f, noise_scheme: %s, outliers_scheme: %s'%(args.dataset, ed, R, mu, sigma, args.noise_scheme, args.outliers_scheme))     
     start = time.time()
     eval_ratio(args.dataset, parameters)
     end = time.time()
