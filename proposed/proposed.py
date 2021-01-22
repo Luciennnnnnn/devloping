@@ -270,9 +270,7 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
         count += TPR
         #X = np.expand_dims(X, 2)
         if t % 800 == 0:
-            logging.debug('np.squeeze(C):' + str(np.squeeze(C)))
             X = np.squeeze(tl.cp_to_tensor((None, [Z[0], Z[1], np.expand_dims(Z_t[t, :], axis=0)])))
-            logging.debug('X:' + str(X))
             logging.debug('t: %d, RSE: %f' % (t, norm(np.squeeze(C)-X-E[:, :, t]) / norm(C)))
         TPRS.append(TPR)
         FPRS.append(FPR)

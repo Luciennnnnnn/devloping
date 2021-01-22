@@ -158,7 +158,7 @@ def generator(dataset_name, parameters):
     elif parameters['outliers_scheme'] == "structural":
         print("outliers_scheme structural")
         outliers = np.random.uniform(0, 5, (DIM[0], DIM[1], DIM[2]))
-        cur_locations = list(range(DIM[0], DIM[1]))
+        cur_locations = list(range(DIM[0] * DIM[1]))
         for t in range(DIM[2]):
             sampled_locations = np.random.choice(cur_locations, int(len(cur_locations) * 0.01), replace=False)
             for x in sampled_locations:
