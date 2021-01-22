@@ -35,16 +35,14 @@ def evaluate(dataset_name, parameters):
     model['precision'] /= Y.shape[2]
     model['FPR'] /= Y.shape[2]
 
-    model['ER'] = np.sum(np.square(model['X'] - Y)) / np.sum(np.square(Y))
-    model['SRR'] = np.sum(np.abs((model['X'] - Y) / Y) <= theta) / np.prod(Y.shape)
-    logging.debug("ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
-    logging.debug("SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
-    logging.debug("SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
+    model['ER'] = np.sum(np.square(L - Y)) / np.sum(np.square(Y))
+    model['SRR'] = np.sum(np.abs((L - Y) / Y) <= theta) / np.prod(Y.shape)
+    logging.debug("SRR22 %f:" %( np.sum((L - Y) / Y <= theta) / np.prod(Y.shape) ) )
     
     Y += noises
-    logging.debug("@ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
-    logging.debug("@SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
-    logging.debug("@SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
+    logging.debug("@ER %f:" %(np.sum(np.square(L - Y)) / np.sum(np.square(Y))))
+    logging.debug("@SRR %f:" %(np.sum(np.abs((L - Y) / Y) <= theta) / np.prod(Y.shape)))
+    logging.debug("@SRR22 %f:" %( np.sum((L - Y) / Y <= theta) / np.prod(Y.shape) ) )
     return model
 
 
