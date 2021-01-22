@@ -141,8 +141,8 @@ def eval_ratio(dataset_name, parameters):
     TPR_file_path += '_TPRS.json'
     FPR_file_path += '_FPRS.json'
     
-    if not os.path.exists(os.path.dirname(TPR_file_path)):
-        os.makedirs(os.path.dirname(TPR_file_path))
+    if not os.path.exists(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path))):
+        os.makedirs(os.path.dirname(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path)))
 
     with open(os.path.join(os.path.join('../../results', dataset_name), TPR_file_path), 'w') as FD:
         logging.info("write to file %s:" %(TPR_file_path))
