@@ -15,7 +15,10 @@ def evaluate(dataset_name, parameters):
     if ed == None:
         ed = Y.shape[2]
     Y = Y[:, :, 0:ed]
+    outliers = outliers[:, :, 0:ed]
     outliers_p = outliers_p[:, :, 0:ed]
+    noises = noises[:, :, 0:ed]
+    Omega = Omega[:, :, 0:ed]
     L, S = T_online(Y=Y + outliers + noises, epsilon=np.sum(outliers_p, (0, 1)), R=R, W=Ws[dataset_name], maxiters=20, init=init)
     model = {}
     model['TPRS'] = []
