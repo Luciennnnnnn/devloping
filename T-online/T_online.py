@@ -181,7 +181,7 @@ def update(t, M, X, S, epsilon, maxiters, A_old, B_old, C_old, T_A1_old, T_A2_ol
             s = elem[1]
             S[s[0], s[1], t+T] = elem[0]
 
-    X[:, :, t+T] = tl.cp_to_tensor((None, [A, B, np.expand_dims(C[-1, :], axis=0)]))
+    X[:, :, t+T] = np.squeeze(tl.cp_to_tensor((None, [A, B, np.expand_dims(C[-1, :], axis=0)])))
     return X, S, A, B, C, T_A1, T_A2, T_B1, T_B2
 
 
