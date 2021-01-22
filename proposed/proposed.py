@@ -216,14 +216,6 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             temp7 = - 0.5 * np.sum(safelog(sigma_E[:, :, t])) \
                     + 0.5 * nObs * (safelog(2 * pi) + 1)
 
-            # temp6 = -0.5 * nObs * safelog(2 * pi) - np.sum(0.5 * safelog(sigma_E0[:, :, t]) \
-            #     - 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E[:, :, t] \
-            #         + np.square(E0[:, :, t]))/sigma_E0[:, :, t])
-
-            # temp7 = 0.5 * nObs * safelog(2 * pi) + np.sum(0.5 * safelog(sigma_E[:, :, t]) \
-            #     + 0.5*(np.square(E[:, :, t]) + sigma_E[:, :, t] - 2*E[:, :, t]*E0[:, :, t] \
-            #         + np.square(E[:, :, t]))/sigma_E[:, :, t])
-
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
             # Display progress

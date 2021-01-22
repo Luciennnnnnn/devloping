@@ -139,7 +139,7 @@ def eval_ratio(dataset_name, parameters):
         start = time.time()
         model = evaluate(dataset_name, parameters)
         end = time.time()
-        logging.info("dataset: %s" %(dataset_name))
+        logging.info("dataset: %s, fraction: %f" %(dataset_name, parameters['fraction']))
         logging.info("one loop cost %f:" %((end - start)/60))
         logging.debug("TPR %f:" %(model['precision']))
         logging.debug("FPR %f:" %(model['FPR']))
