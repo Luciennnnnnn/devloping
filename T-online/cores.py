@@ -36,9 +36,10 @@ def evaluate(dataset_name, parameters):
     model['precision'] /= Y.shape[2]
     model['FPR'] /= Y.shape[2]
 
+    model['RSE'] = norm(L - Y) / norm(Y)
     model['ER'] = np.sum(np.square(L - Y)) / np.sum(np.square(Y))
     model['SRR'] = np.sum(np.abs((L - Y) / Y) <= theta) / np.prod(Y.shape)
-    logging.debug('final RSE: %f' % (norm(Y-L-S) / norm(Y)))
+    logging.debug('final RSE: %f' % (model['RSE']))
     logging.debug("SRR22 %f:" %( np.sum((L - Y) / Y <= theta) / np.prod(Y.shape) ) )
     
     Y += noises

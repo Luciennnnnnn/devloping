@@ -21,8 +21,16 @@ def evaluate(dataset_name, parameters):
     # print('outlier', np.sum(outliers_p * outlier))
     # print('noises', np.sum(noises))
     model = VITAD(Y=Y + outliers + noises, outliers_p=outliers_p, Omega=Omega, maxRank=R, maxiters=20, tol=1e-4, init=inits[dataset_name])
+    model['RSE'] = norm(model['X'] - Y) / norm(Y)
     model['ER'] = np.sum(np.square(model['X'] - Y)) / np.sum(np.square(Y))
     model['SRR'] = np.sum(np.abs((model['X'] - Y) / Y) <= theta) / np.prod(Y.shape)
+
+    logging.debug("noise: %s" %(str(noises)))
+    logging.debug("Y: %s" %(str(Y)))
+    logging.debug("X: %s" %(str(model['X2'])))
+    logging.debug("Y + noise: %s" %(str(Y + noises)))
+
+    logging.debug("RSE2 %f:" %(norm(model['X'] - Y) / norm(Y)))
     logging.debug("ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
     logging.debug("SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
     logging.debug("SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )
