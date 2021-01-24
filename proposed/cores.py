@@ -30,7 +30,7 @@ def evaluate(dataset_name, parameters):
     logging.debug("X: %s" %(str(model['X2'])))
     logging.debug("Y + noise: %s" %(str(Y + noises)))
 
-    logging.debug("RSE2 %f:" %(norm(model['X'] - Y) / norm(Y)))
+    logging.debug("RSE2 %f:" %(norm(model['X2'] - Y) / norm(Y)))
     logging.debug("ER2 %f:" %(np.sum(np.square(model['X2'] - Y)) / np.sum(np.square(Y))))
     logging.debug("SRR2 %f:" %(np.sum(np.abs((model['X2'] - Y) / Y) <= theta) / np.prod(Y.shape)))
     logging.debug("SRR22 %f:" %( np.sum((model['X2'] - Y) / Y <= theta) / np.prod(Y.shape) ) )

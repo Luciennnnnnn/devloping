@@ -118,7 +118,7 @@ def eval_ratio(dataset_name, parameters):
     TPRS = []
     FPRS = []
 
-    for fraction in range(1, 6, 1):
+    for fraction in range(1, 11, 1):
         parameters['fraction'] = fraction / 100
         start = time.time()
         model = evaluate(dataset_name, parameters)
