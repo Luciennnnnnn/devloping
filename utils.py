@@ -83,8 +83,8 @@ def generator(dataset_name, parameters):
         print("noise_scheme Gaussian")
         gaussian_noise = np.random.normal(0, 0.01, (DIM[0], DIM[1], DIM[2])) # 100%
         noises += gaussian_noise
-    elif parameters['noise_scheme'] == "outlier":
-        print("noise_scheme outlier")
+    elif parameters['noise_scheme'] == "random":
+        print("noise_scheme random")
         outlier_noise = np.random.uniform(-0.05, 0.05, (DIM[0], DIM[1], DIM[2]))
         
         sampled_locations = np.random.choice(locations, int(len(locations) * 0.1), replace=False)
