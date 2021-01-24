@@ -134,29 +134,14 @@ def plot_noise(dataset_name):
     x = []
     for i in range(10):
         x.append(i / 10)
-    pre = os.path.join(os.path.join('results', dataset_name))
 
-    # with open(os.path.join(pre, os.path.join('proposed', 'noise_ER.json')), 'r') as FR:
-    #     y = json.loads(FR.read())
-
-    # with open(os.path.join(pre, os.path.join('proposed', 'noise_ER.json')), 'r') as FR:
-    #     y = json.loads(FR.read())
-
-    # with open(os.path.join(pre, os.path.join('proposed', 'noise_ER.json')), 'r') as FR:
-    #     y = json.loads(FR.read())
-
-    # with open(os.path.join(pre, os.path.join('proposed', 'noise_ER.json')), 'r') as FR:
-    #     y = json.loads(FR.read())
-
-    # with open(os.path.join(pre, os.path.join('proposed', 'noise_ER.json')), 'r') as FR:
-    #     y = json.loads(FR.read())
-    plt.figure(figsize=(14, 6))
+    fig, ax1 = plt.subplots(1, 1, figsize=(9, 6))
     # Gaussian anomaly enum anomaly ratio
     # [1.218317, 1.231309, 1.201047, 1.219431, 1.131734, 1.171725]
 
     # ER: Without noise and anomaly enum missing ratio from 0 ~ 0.9 Done 2021-01-21 22:30:36.log
-    y1 = [1.257989, 1.479484, 1.520001, 2.118648, 2.348242, 3.571217, 3.374463, 12.244402, 49.602915, 295.510673]
-    
+    #y1 = [1.257989, 1.479484, 1.520001, 2.118648, 2.348242, 3.571217, 3.374463, 12.244402, 49.602915, 295.510673]
+    y1 = [1.257989, 1.479484, 1.520001, 2.118648, 2.348242, 3.571217, 3.6122427376227653, 12.244402, 49.602915, 295.510673]
     # ER: Gaussian noise enum missing ratio from 0 ~ 0.9 Done 2021-01-21 22:32:26.log
     y2 = [1.174613, 1.301723, 1.533960, 1.977712, 2.038753, 3.141521, 4.522832, 9.745681, 28.832551, 338.805911]
     
@@ -176,124 +161,122 @@ def plot_noise(dataset_name):
     y7 = np.random.randn(10) # 正常
 
     # ER: Gaussian noise and Structural anomaly enum missing ratio from 0 ~ 0.9 ?? 2021-01-21 22:50:44.log 好 ｜｜ 2021-01-22 09:42:32.log 坏
-    y8 = [1.187148, 1.381492, 1.499855, 2.084450, 1.653089, 2.005807, 3.901273, 11, 11, 11]
+    y8 = [1.187148, 1.381492, 1.499855, 2.084450, 1.653089, 2.005807, 3.901273, 10.12415, 31.9345934, 442.094751134]
 
+    # ER: noise: random, outliers: Gaussian
+    y9 = [1.135438, 2.643356389832484, 3.3633011966147635, 6.247521371847992, 8.912397579723127, 11.322172433832524, 11.44767124476099, 23.90881119741411, 34.469985829338086, 451.2238542202693]
     
-    plt.subplot(1, 2, 1)
-    plt.plot(range(len(x)), y1, color='#3d5d46', marker='o', linestyle='-', label='Without noise and anomaly')
-    plt.plot(range(len(x)), y2, color='#8dabb6', marker='s', linestyle='--', label='Gaussian noise')
-    plt.plot(range(len(x)), y3, color='#aa5598', marker='v', linestyle='--', label='Gaussian anomaly')
-    plt.plot(range(len(x)), y4, color='#32509c', marker='p', linestyle='--', label='Random anomaly')
-    plt.plot(range(len(x)), y5, color='#d93731', marker='*', linestyle='--', label='Structural anomaly')
-    plt.plot(range(len(x)), y6, color='#ddccc5', marker='D', linestyle='-.', label='Gaussian noise and Random anomaly')
-    plt.plot(range(len(x)), y7, color='#ffa289', marker='h', linestyle=':', label='Gaussian noise and Exponential anomaly')
-    plt.plot(range(len(x)), y8, color='#4ec9b0', marker='X', linestyle=':', label='Gaussian noise and Structural anomaly')
-    plt.xticks(range(len(x)), x)
-    plt.legend(fontsize=14)
-    plt.xlabel('Missing ratio', fontsize=14)
-    plt.ylabel('ER', fontsize=14)
+    # ER: noise: mixture, outliers: Gaussian
+    y10 = [4.144085, 8.216227993035949, 15.487121229110633, 21.021754481598542, 23.789226084159907, 43.542224492537954, 50.5487106933616, 68.05000722648721, 217.4876030362145, 907.697348722337]
+    
+    ax1.plot(range(len(x)), y1, color='#3d5d46', marker='o', linestyle='-', label='without noise and outliers')
+    ax1.plot(range(len(x)), y2, color='#8dabb6', marker='s', linestyle='--', label='noise only : Gaussian')
+    ax1.plot(range(len(x)), y3, color='#aa5598', marker='v', linestyle='-.', label='outliers only : Gaussian')
+    #ax1.plot(range(len(x)), y4, color='#32509c', marker='p', linestyle='--', label='Random anomaly')
+    #ax1.plot(range(len(x)), y5, color='#d93731', marker='*', linestyle='--', label='Structural anomaly')
+    #ax1.plot(range(len(x)), y6, color='#ddccc5', marker='D', linestyle='-.', label='Gaussian noise and Random anomaly')
+    #ax1.plot(range(len(x)), y7, color='#ffa289', marker='h', linestyle=':', label='Gaussian noise and Exponential anomaly')
+    ax1.plot(range(len(x)), y8, color='#4ec9b0', marker='X', linestyle=':', label='noise: Gaussian, outliers: Structural')
+    ax1.plot(range(len(x)), y9, color='#32509c', marker='*', linestyle='-', label='noise: random, outliers: Gaussian')
+    ax1.plot(range(len(x)), y10, color='#d93731', marker='p', linestyle='--', label='noise: mixture, outliers: Gaussian')
+    ax1.set_xticks(range(len(x)))
+    ax1.set_xticklabels(x)
+    ax1.legend(fontsize=12)
+    ax1.set_xlabel('Missing ratio', fontsize=14)
+    ax1.set_ylabel('ER', fontsize=14)
 
-    plt.subplot(1, 2, 2)
-    plt.plot(range(len(x)), y1, color='#3d5d46', marker='o', linestyle='-', label='Without noise and anomaly')
-    plt.plot(range(len(x)), y2, color='#8dabb6', marker='s', linestyle='--', label='Gaussian noise')
-    plt.plot(range(len(x)), y3, color='#aa5598', marker='v', linestyle='--', label='Gaussian anomaly')
-    plt.plot(range(len(x)), y4, color='#32509c', marker='p', linestyle='--', label='Random anomaly')
-    plt.plot(range(len(x)), y5, color='#d93731', marker='*', linestyle='--', label='Structural anomaly')
-    plt.plot(range(len(x)), y6, color='#ddccc5', marker='D', linestyle='-.', label='Gaussian noise and Random anomaly')
-    plt.plot(range(len(x)), y7, color='#ffa289', marker='h', linestyle=':', label='Gaussian noise and Exponential anomaly')
-    plt.plot(range(len(x)), y8, color='#4ec9b0', marker='X', linestyle=':', label='Gaussian noise and Structural anomaly')
-    plt.xticks(range(len(x)), x)
-    plt.legend(fontsize=14)
-    plt.xlabel('Missing ratio', fontsize=14)
-    plt.ylabel('FPR', fontsize=14)
-    plt.savefig('noise_ER.png', format='png')
-    plt.savefig('noise_ER.pdf', format='pdf')
-    plt.savefig('noise_ER.eps', format='eps')
+    fig.savefig('noise_ER.png', format='png')
+    fig.savefig('noise_ER.pdf', format='pdf')
+    fig.savefig('noise_ER.eps', format='eps')
     plt.clf()
-    plt.close()
 
 def plot_final_outlier_ratio(dataset_name):
     x = []
-    for i in range(10):
-        x.append(i / 10)
+    for i in range(1, 11, 1):
+        x.append(i / 100)
 
-    plt.figure(figsize=(14, 6))
-
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     # T-online noise_scheme: Gaussian, outliers_scheme: random
-    y1 = [0.9771760416666673, 0.9749359623015879, 0.9769278291153296, 0.9773115793928305, 0.9790448734272263, 0.9805892285211996, 0.9746154576654011, 0.9808633742026612, 0.9780628426534764, 0.9785193059878463]
-    
+    #y1 = [0.9771760416666673, 0.9749359623015879, 0.9769278291153296, 0.9773115793928305, 0.9790448734272263, 0.9805892285211996, 0.9746154576654011, 0.9808633742026612, 0.9780628426534764, 0.9785193059878463]
+    y1 = [0.9771760416666673, 0.9749359623015879, 0.9742097784374412, 0.9741680553246821, 0.9738162594966712, 0.9730777380368685, 0.9727194839392058, 0.9723453550963479, 0.9720831323701619, 0.9716099594696959]
     # T-online noise_scheme: Gaussian, outliers_scheme: Exponential
-    y2 = [0.9491023809523833, 0.9343518308080863, 0.9307166278166317, 0.9315883318070803, 0.9332154612243614, 0.9339241748163037, 0.9312864307078829, 0.9324700487550633, 0.9317004570173697, 0.9322872729337796]
-    
+    #y2 = [0.9491023809523833, 0.9343518308080863, 0.9307166278166317, 0.9315883318070803, 0.9332154612243614, 0.9339241748163037, 0.9312864307078829, 0.9324700487550633, 0.9317004570173697, 0.9322872729337796]
+    y2 = [0.9491023809523833, 0.9343518308080863, 0.9307166278166317, 0.9306680764556164, 0.9306369419915795, 0.9304276776618011, 0.9303885823117126, 0.9300458400840629, 0.9300289677450645, 0.9296743068850877]
     # T-online noise_scheme: Gaussian, outliers_scheme: Gaussian
-    y3 = [0.9338175595238121, 0.9244026289682604, 0.9206369318181868, 0.9203847422389722, 0.9209521860288358, 0.9206287494067682, 0.9242320316885139, 0.9233479688940006, 0.924069788374433, 0.923719626242013]
-
+    #y3 = [0.9338175595238121, 0.9244026289682604, 0.9206369318181868, 0.9203847422389722, 0.9209521860288358, 0.9206287494067682, 0.9242320316885139, 0.9233479688940006, 0.924069788374433, 0.923719626242013]
+    y3 = [0.9338175595238121, 0.9244026289682604, 0.9206369318181868, 0.9203847422389722, 0.9201848389118741, 0.9199866636480947, 0.919899990334069, 0.9194328203243687, 0.9190659705137403, 0.9190315145345962]
     # T-online noise_scheme: Gaussian, outliers_scheme: structural
-
-    y4 = [0.978375, 0.9745, 0.97771875, 0.9774500000000009, 0.9779107142857192, 0.9744375, 0.9783749999999956, 0.9774318181818257, 0.9760000000000089, 0.9782053571428603]
-
+    #y4 = [0.978375, 0.9745, 0.97771875, 0.9774500000000009, 0.9779107142857192, 0.9744375, 0.9783749999999956, 0.9774318181818257, 0.9760000000000089, 0.9782053571428603]
+    y4 = [0.978375, 0.9745, 0.9714219127733846, 0.9675733426158918, 0.967494028003294, 0.9671377589476288, 0.9629845464003776, 0.9613980332731312, 0.9582780399108867, 0.958187222217241]
     # VITAD noise_scheme: Gaussian, outliers_scheme: random
-    y5 = [0.992940, 0.991720, 0.992262, 0.986436, 1, 1, 1, 1, 1, 1]
+    #y5 = [0.992940, 0.991720, 0.992262, 0.986436, 1, 1, 1, 1, 1, 1]
+    y5 = [0.99294, 0.99172, 0.9916242761898896, 0.986436, 0.9862327511364953, 0.9861473481455071, 0.9857588223287094, 0.9857021500439591, 0.9853446486288195, 0.9852310665167233]
     # VITAD noise_scheme: Gaussian, outliers_scheme: Exponential
-    y6 = [0.957606, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    #y6 = [0.957606, 0.948779, 0.947458, 1, 1, 1, 1, 1, 1, 1]
+    y6 = [0.957606, 0.948779, 0.947458, 0.9472097533063177, 0.9468964459701371, 0.946024073476967, 0.9451314323203485, 0.9442380966111049, 0.9433516833021884, 0.9429028043970835]
     # VITAD noise_scheme: Gaussian, outliers_scheme: Gaussian
-    y7 = [0.943630, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    #y7 = [0.943630, 0.932196, 0.932024, 1, 1, 1, 1, 1, 1, 1]
+    y7 = [0.94363, 0.932196, 0.932024, 0.9310814430707657, 0.9303462168250825, 0.9299483249539463, 0.9296982177995623, 0.9289666831764164, 0.9283323826506614, 0.9274057196984615]
     # VITAD noise_scheme: Gaussian, outliers_scheme: structural
-    y8 = [0.993625, 0.991250, 0.978406, 0.993550, 1, 1, 1, 1, 1, 1]
+    #y8 = [0.993625, 0.991250, 0.978406, 0.993550, 1, 1, 1, 1, 1, 1]
+    y8 = [0.993625, 0.99125, 0.978406, 0.9781993003232978, 0.9777227222997095, 0.9772698975852336, 0.9772362918664942, 0.9772253852481262, 0.9768678579415543, 0.9767989554410533]
 
-
-    plt.subplot(1, 2, 1)
-    plt.plot(range(len(x)), y1, color='#3d5d46', marker='o', linestyle='-', label='T-online noise: Gaussian, outliers: random')
-    plt.plot(range(len(x)), y2, color='#8dabb6', marker='s', linestyle='--', label='T-online noise: Gaussian, outliers: Exponential')
-    plt.plot(range(len(x)), y3, color='#aa5598', marker='v', linestyle='--', label='T-online noise: Gaussian, outliers: Gaussian')
-    plt.plot(range(len(x)), y4, color='#32509c', marker='p', linestyle='--', label='T-online noise: Gaussian, outliers: structural')
-    plt.plot(range(len(x)), y5, color='#d93731', marker='*', linestyle='--', label='VITAD noise: Gaussian, outliers: random')
-    plt.plot(range(len(x)), y6, color='#ddccc5', marker='D', linestyle='-.', label='VITAD noise: Gaussian, outliers: Exponential')
-    plt.plot(range(len(x)), y7, color='#ffa289', marker='h', linestyle=':', label='VITAD noise: Gaussian, outliers: Gaussian')
-    plt.plot(range(len(x)), y8, color='#4ec9b0', marker='X', linestyle=':', label='VITAD noise: Gaussian, outliers: structural')
-    plt.xticks(range(len(x)), x)
-    plt.xlabel('outlier ratio', fontsize=14)
-    plt.ylabel('TPR', fontsize=14)
+    ax1.plot(range(len(x)), y1, color='#3d5d46', marker='1', linestyle='--', label='T-online - noise: Gaussian, outliers: random')
+    ax1.plot(range(len(x)), y2, color='#8dabb6', marker='2', linestyle='--', label='T-online - noise: Gaussian, outliers: Exponential')
+    ax1.plot(range(len(x)), y3, color='#aa5598', marker='3', linestyle='--', label='T-online - noise: Gaussian, outliers: Gaussian')
+    ax1.plot(range(len(x)), y4, color='#32509c', marker='4', linestyle='--', label='T-online - noise: Gaussian, outliers: structural')
+    ax1.plot(range(len(x)), y5, color='#d93731', marker='v', linestyle='-', label='VITAD - noise: Gaussian, outliers: random')
+    ax1.plot(range(len(x)), y6, color='#ddccc5', marker='^', linestyle='-', label='VITAD - noise: Gaussian, outliers: Exponential')
+    ax1.plot(range(len(x)), y7, color='#ffa289', marker='<', linestyle='-', label='VITAD - noise: Gaussian, outliers: Gaussian')
+    ax1.plot(range(len(x)), y8, color='#4ec9b0', marker='>', linestyle='-', label='VITAD - noise: Gaussian, outliers: structural')
+    ax1.set_xticks(range(len(x)))
+    ax1.set_xticklabels(x)
+    ax1.set_xlabel('outlier ratio', fontsize=14)
+    ax1.set_ylabel('TPR', fontsize=14)
+    ax1.text(0.5, -0.135, '(a)', ha='center', fontsize=14, weight='bold', transform=ax1.transAxes)
 
     # T-online noise_scheme: Gaussian, outliers_scheme: random
-    y1 = [0.0002859621738373123, 0.0005582550932535048, 0.0007550453269559344, 0.0009650747645486992, 0.0011470933312162435, 0.0012918660652188074, 0.0019597030364725118, 0.001730272392071036, 0.0022279514481818286, 0.0024371587031501176]
-
+    #y1 = [0.0002859621738373123, 0.0005582550932535048, 0.0007550453269559344, 0.0009650747645486992, 0.0011470933312162435, 0.0012918660652188074, 0.0019597030364725118, 0.001730272392071036, 0.0022279514481818286, 0.0024371587031501176]
+    y1 = [0.0002859621738373123, 0.0005582550932535048, 0.0007550453269559344, 0.0009650747645486992, 0.0011470933312162435, 0.0012918660652188074, 0.0019597030364725118, 0.002237398826330531, 0.002343284481953799, 0.0024371587031501176]
     # T-online noise_scheme: Gaussian, outliers_scheme: Exponential
+    #y2 = [0.000679936335132494, 0.001418785037948584, 0.0021671671067188497, 0.0029018074012744483, 0.003591146188892552, 0.004294291792242073, 0.005222203428427119, 0.005904113085795402, 0.00678964181281522, 0.007590888283783878]
     y2 = [0.000679936335132494, 0.001418785037948584, 0.0021671671067188497, 0.0029018074012744483, 0.003591146188892552, 0.004294291792242073, 0.005222203428427119, 0.005904113085795402, 0.00678964181281522, 0.007590888283783878]
-    
     # T-online noise_scheme: Gaussian, outliers_scheme: Gaussian
+    #y3 = [0.0008633685581869231, 0.0016827190589197968, 0.0025005080764070814, 0.003337741572618528, 0.004149335946214509, 0.00505965148763266, 0.0057075281004491385, 0.006800150262737173, 0.007529068571119375, 0.008541115026912578]
     y3 = [0.0008633685581869231, 0.0016827190589197968, 0.0025005080764070814, 0.003337741572618528, 0.004149335946214509, 0.00505965148763266, 0.0057075281004491385, 0.006800150262737173, 0.007529068571119375, 0.008541115026912578]
-
     # T-online noise_scheme: Gaussian, outliers_scheme: structural
+    #y4 = [0.00015122377622377642, 0.0003591549295774676, 0.0006366071428571408, 0.0008111510791366861, 0.0011286496350365164, 0.0015036764705882789, 0.0016138059701492741, 0.0018665413533835058, 0.0021818181818182296, 0.0023471153846154526]
     y4 = [0.00015122377622377642, 0.0003591549295774676, 0.0006366071428571408, 0.0008111510791366861, 0.0011286496350365164, 0.0015036764705882789, 0.0016138059701492741, 0.0018665413533835058, 0.0021818181818182296, 0.0023471153846154526]
-
     # VITAD noise_scheme: Gaussian, outliers_scheme: random
-    y5 = [0.000092, 0.000192, 0.000262, 0.000573, 0, 0, 0, 0, 0, 0]
+    #y5 = [0.000092, 0.000192, 0.000262, 0.000573, 0, 0, 0, 0, 0, 0]
+    y5 = [9.2e-05, 0.000192, 0.000262, 0.000573, 0.0009356831143836569, 0.0010432037287413517, 0.0012071354414814723, 0.0014476572226113525, 0.0016137874942879276, 0.0017122776749523482]
     # VITAD noise_scheme: Gaussian, outliers_scheme: Exponential
-    y6 = [0.000571, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    #y6 = [0.000571, 0.001110, 0.001651, 0, 0, 0, 0, 0, 0, 0]
+    y6 = [0.000571, 0.00111, 0.001651, 0.00177222985827452, 0.0022661992270921797, 0.0026879484379159265, 0.0027427961818496057, 0.00290185677110716, 0.003293573989168836, 0.0034975389012130514]
     # VITAD noise_scheme: Gaussian, outliers_scheme: Gaussian
-    y7 = [0.0007310, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    #y7 = [0.0007310, 0.001444, 0.002173 , 0, 0, 0, 0, 0, 0, 0]
+    y7 = [0.000731, 0.001444, 0.002173, 0.0026264432474812993, 0.0027273129432005506, 0.003103584737284152, 0.0034797671009645127, 0.0038498213714798515, 0.004307588981246996, 0.004500311177559685]
     # VITAD noise_scheme: Gaussian, outliers_scheme: structural
-    y8 = [0.000045, 0.000123, 0.000617, 0.000232, 0, 0, 0, 0, 0, 0]
+    y8 = [4.5e-05, 0.000123, 0.000617, 0.0009129977980066233, 0.0010159151542109043, 0.0013869537525212324, 0.0017590321799327371, 0.001956229444830616, 0.0022901665328532, 0.0024567800548143796]
 
-    plt.subplot(1, 2, 2)
-    plt.plot(range(len(x)), y1, color='#3d5d46', marker='o', linestyle='-', label='T-online noise: Gaussian, outliers: random')
-    plt.plot(range(len(x)), y2, color='#8dabb6', marker='s', linestyle='--', label='T-online noise: Gaussian, outliers: Exponential')
-    plt.plot(range(len(x)), y3, color='#aa5598', marker='v', linestyle='--', label='T-online noise: Gaussian, outliers: Gaussian')
-    plt.plot(range(len(x)), y4, color='#32509c', marker='p', linestyle='--', label='T-online noise: Gaussian, outliers: structural')
-    plt.plot(range(len(x)), y5, color='#d93731', marker='*', linestyle='--', label='VITAD noise: Gaussian, outliers: random')
-    plt.plot(range(len(x)), y6, color='#ddccc5', marker='D', linestyle='-.', label='VITAD noise: Gaussian, outliers: Exponential')
-    plt.plot(range(len(x)), y7, color='#ffa289', marker='h', linestyle=':', label='VITAD noise: Gaussian, outliers: Gaussian')
-    plt.plot(range(len(x)), y8, color='#4ec9b0', marker='X', linestyle=':', label='VITAD noise: Gaussian, outliers: structural')
-    plt.xticks(range(len(x)), x)
-    plt.legend(fontsize=12)
-    plt.xlabel('outlier ratio', fontsize=14)
-    plt.ylabel('FPR', fontsize=14)
-    plt.savefig('outlier.png', format='png')
-    plt.savefig('outlier.pdf', format='pdf')
-    plt.savefig('outlier.eps', format='eps')
-    plt.clf()
-    plt.close()
+    ax2.plot(range(len(x)), y1, color='#3d5d46', marker='1', linestyle='--', label='T-online - noise: Gaussian, outliers: random')
+    ax2.plot(range(len(x)), y2, color='#8dabb6', marker='2', linestyle='--', label='T-online - noise: Gaussian, outliers: Exponential')
+    ax2.plot(range(len(x)), y3, color='#aa5598', marker='3', linestyle='--', label='T-online - noise: Gaussian, outliers: Gaussian')
+    ax2.plot(range(len(x)), y4, color='#32509c', marker='4', linestyle='--', label='T-online - noise: Gaussian, outliers: structural')
+    ax2.plot(range(len(x)), y5, color='#d93731', marker='v', linestyle='-', label='VITAD - noise: Gaussian, outliers: random')
+    ax2.plot(range(len(x)), y6, color='#ddccc5', marker='^', linestyle='-', label='VITAD - noise: Gaussian, outliers: Exponential')
+    ax2.plot(range(len(x)), y7, color='#ffa289', marker='<', linestyle='-', label='VITAD - noise: Gaussian, outliers: Gaussian')
+    ax2.plot(range(len(x)), y8, color='#4ec9b0', marker='>', linestyle='-', label='VITAD - noise: Gaussian, outliers: structural')
+    ax2.set_xticks(range(len(x)))
+    ax2.set_xticklabels(x)
+    ax2.legend(fontsize=12)
+    ax2.set_xlabel('outlier ratio', fontsize=14)
+    ax2.set_ylabel('FPR', fontsize=14)
+    ax2.text(0.5, -0.135, '(b)', ha='center', fontsize=14, weight='bold', transform=ax2.transAxes)
+    fig.savefig('outlier.png', format='png')
+    fig.savefig('outlier.pdf', format='pdf')
+    fig.savefig('outlier.eps', format='eps')
+    fig.clf()
 
 def locations():
     x = range(ed)
@@ -315,5 +298,5 @@ def locations():
 
 
 if __name__ == '__main__':
-    # plot_noise('Abilene')
-    plot_final_outlier_ratio('Abilene')
+    plot_noise('Abilene')
+    # plot_final_outlier_ratio('Abilene')
