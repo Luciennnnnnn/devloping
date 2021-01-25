@@ -168,10 +168,11 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             E[:, :, t] = (tau * np.squeeze(C-np.expand_dims(X, axis=2)) + sigma_E0[:, :, t]*E0[:, :, t]) / sigma_E[:, :, t]
 
             # calculate lowerbound
+            # all the const part in bottom is actually not needed, can be removed for more fast calculattion.
 
             # E_q[lnp(\mathcal{Y} | \mathcal{E}, \tau^{-1})]
             temp1 = 0.5 * nObs * (digamma(a_tauN) - safelog(b_tauN)) - 0.5 * tau * err \
-                    - 0.5 * nObs * safelog(2 * pi)
+                    - 0.5 * nObs * safelog(2 * pi) # const
 
             # E_q[lnp(A)]
             temp2 = 0 
@@ -181,27 +182,27 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
                         - 0.5 * np.dot(np.expand_dims(Z[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z[n][i, :], 1)) \
                         + np.dot(np.expand_dims(Z[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0[n][i, :], 1)) \
                          -0.5 * np.dot(np.expand_dims(Z0[n][i, :], 0), inv(ZSigma0[n][:, :, i])).dot(np.expand_dims(Z0[n][i, :], 1)) \
-                         -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0[n][:, :, i])) #const
+                         -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0[n][:, :, i])) # last two line const
 
             temp2 += - 0.5 * np.trace(inv(ZSigma0_t[:, :, t]).dot(ZSigma_t[:, :, t])) \
                     - 0.5 * np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), inv(ZSigma0_t[:, :, t])).dot(np.reshape(Z_t[t, :], [R, 1]))) \
                     + np.squeeze(np.dot(np.expand_dims(Z_t[t, :], axis=0), inv(ZSigma0_t[:, :, t])).dot(np.reshape(Z0_t[t, :], [R, 1]))) \
                     -0.5 * np.dot(np.expand_dims(Z0_t[t, :], 0), inv(ZSigma0_t[:, :, t])).dot(np.expand_dims(Z0_t[t, :], 1)) \
-                    -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0_t[:, :, t]))
+                    -0.5 * R * safelog(2 * pi) - 0.5 * safelog(det(ZSigma0_t[:, :, t])) # last two line const
 
             # E_q[lnp(\tau)]
             temp3 = (a_tau0 - 1) * (digamma(a_tauN) - safelog(b_tauN)) - b_tau0 * tau \
-                    -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0)
+                    -safelog(gamma(a_tau0)) + a_tau0 * safelog(b_tau0) # const
 
             # E_q[lnq(A)]
             temp4 = 0
             for n in range(N-1):
                 for i in range(dimY[n]):
                     temp4 += 0.5 * safelog(det(ZSigma[n][:, :, i])) \
-                        + 0.5 * R * (1 + safelog(2 * pi))
+                        + 0.5 * R * (1 + safelog(2 * pi)) # consts
 
             temp4 += 0.5 * safelog(det(ZSigma_t[:, :, t])) \
-                    + 0.5 * R * (1 + safelog(2 * pi))
+                    + 0.5 * R * (1 + safelog(2 * pi)) # const
 
             # -E_q[lnq(\tau)]
             temp5 = safelog(gamma(a_tauN)) - (a_tauN - 1) * digamma(a_tauN) - safelog(b_tauN) + a_tauN
@@ -210,11 +211,11 @@ def VITAD(Y, outliers_p, Omega, maxRank, maxiters, tol=1e-5, init='ml'):
             temp6 = -0.5 * np.sum(sigma_E0[:, :, t] * (np.square(E[:, :, t]) + np.reciprocal(sigma_E[:, :, t])
                                 - 2*E[:, :, t]*E0[:, :, t])) \
                     -0.5 * nObs * safelog(2 * pi) + 0.5 * np.sum(safelog(sigma_E0)) \
-                    -0.5 * np.sum(sigma_E0[:, :, t] * np.square(E0[:, :, t]))
+                    -0.5 * np.sum(sigma_E0[:, :, t] * np.square(E0[:, :, t])) # last two line const
 
             # -E_q[lnq(\mathcal{E})]
             temp7 = - 0.5 * np.sum(safelog(sigma_E[:, :, t])) \
-                    + 0.5 * nObs * (safelog(2 * pi) + 1)
+                    + 0.5 * nObs * (safelog(2 * pi) + 1) # const
 
             LB.append(temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7)
 
