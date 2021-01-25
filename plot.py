@@ -139,27 +139,27 @@ def plot_noise(dataset_name):
     # Gaussian anomaly enum anomaly ratio
     # [1.218317, 1.231309, 1.201047, 1.219431, 1.131734, 1.171725]
 
-    # ER: Without noise and anomaly enum missing ratio from 0 ~ 0.9 Done 2021-01-21 22:30:36.log
+    # ER: Without noise and anomaly enum missing ratio from 0 ~ 0.9
     y1 = [1.257989, 1.479484, 1.520001, 2.118648, 2.348242, 3.571217, 3.6122427376227653, 12.244402, 49.602915, 295.510673]
-    # ER: Gaussian noise enum missing ratio from 0 ~ 0.9 Done 2021-01-21 22:32:26.log
+    # ER: Gaussian noise enum missing ratio from 0 ~ 0.9
     y2 = [1.174613, 1.301723, 1.533960, 1.977712, 2.038753, 3.141521, 4.522832, 9.745681, 28.832551, 338.805911]
     
-    # ER: Gaussian anomaly enum missing ratio from 0 ~ 0.9 Done 2021-01-21 22:51:40.log
+    # ER: Gaussian anomaly enum missing ratio from 0 ~ 0.9
     y3 = [1.135438, 1.285860, 1.441335, 1.787816, 1.847997, 2.851324, 4.331003, 12.189432, 28.037928, 438.592552]
     
-    # ER: Random anomaly enum missing ratio from 0 ~ 0.9 17225 2021-01-22 22:07:58.log
+    # ER: Random anomaly enum missing ratio from 0 ~ 0.9
     y4 = np.random.randn(10) # 考虑RSE
 
-    # ER: Structural anomaly enum missing ratio from 0 ~ 0.9 17196 2021-01-22 22:01:26.log
+    # ER: Structural anomaly enum missing ratio from 0 ~ 0.9
     y5 = np.random.randn(10) #考虑RSE
 
-    # ER: Gaussian noise and Random anomaly enum missing ratio from 0 ~ 0.9 17250 2021-01-22 22:11:16.log
+    # ER: Gaussian noise and Random anomaly enum missing ratio from 0 ~ 0.9
     y6 = np.random.randn(10) # 貌似计算进了噪声 打印看看
 
-    # ER: Gaussian noise and Exponential anomaly enum missing ratio from 0 ~ 0.9 17291 2021-01-22 22:32:02.log
+    # ER: Gaussian noise and Exponential anomaly enum missing ratio from 0 ~ 0.9
     y7 = np.random.randn(10) # 正常
 
-    # ER: Gaussian noise and Structural anomaly enum missing ratio from 0 ~ 0.9 ?? 2021-01-21 22:50:44.log 好 ｜｜ 2021-01-22 09:42:32.log 坏
+    # ER: Gaussian noise and Structural anomaly enum missing ratio from 0 ~ 0.9 
     y8 = [1.187148, 1.381492, 1.499855, 2.084450, 1.653089, 2.005807, 3.901273, 10.12415, 31.9345934, 442.094751134]
 
     # ER: noise: random, outliers: Gaussian
