@@ -160,7 +160,7 @@ def generator(dataset_name, parameters):
         outliers = np.random.uniform(0, 5, (DIM[0], DIM[1], DIM[2]))
         cur_locations = list(range(DIM[0] * DIM[1]))
         for t in range(DIM[2]):
-            sampled_locations = np.random.choice(cur_locations, int(len(cur_locations) * 0.01), replace=False)
+            sampled_locations = np.random.choice(cur_locations, int(len(cur_locations) * fraction), replace=False)
             for x in sampled_locations:
                 i = x // DIM[1]
                 j = x % DIM[1]
@@ -170,7 +170,7 @@ def generator(dataset_name, parameters):
     elif parameters['outliers_scheme'] == "random":
         print("outliers_scheme random")
         outliers = np.random.uniform(0, 5, (DIM[0], DIM[1], DIM[2]))
-        sampled_locations = np.random.choice(locations, int(len(locations) * 0.01), replace=False)
+        sampled_locations = np.random.choice(locations, int(len(locations) * fraction), replace=False)
         for x in sampled_locations:
             k = x // (DIM[0] * DIM[1])
             x %= (DIM[0] * DIM[1])
